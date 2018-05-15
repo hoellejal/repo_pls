@@ -4,6 +4,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+void afficher_liste_noeud(pliste_t liste) {
+    if(!liste)
+        return ;
+    pnoeud_t n = liste->tete;
+    while(n != NULL) {
+        printf("%d | ", n->poids);
+        n = n->suiv;
+    }
+    printf("\n");
+}
+
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
@@ -31,6 +42,7 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
   pnoeud_t noeud = creer_noeud(occurence[i]);
   liste->tete = noeud;
   pnoeud_t noeud_crt = liste->tete;
+  i++;
 
   for (; i < 256; i++) {
     if (occurence[i] != 0) {
@@ -49,9 +61,26 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
 pnoeud_t creer_arbre_canonique(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
+
+  //TEST
+  afficher_liste_noeud(liste);
 }
 
+
+
+void test_conversion_tableau_liste() {
+    int *occ = malloc(sizeof(int) * 256);
+    occ[2] = 5;
+    occ[10] = 59;
+    occ[240] = 9;
+    creer_arbre_canonique(occ);
+}
+
+
+
 int main(int argc, char const *argv[]) {
-  /* code */
+    test_conversion_tableau_liste();
+
+
   return 0;
 }
