@@ -42,6 +42,8 @@ pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
 void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
                            pcodage_t table, int profondeur);
 
+decalage_256(uint256_t valeur);
+
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
