@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-
+#include "main.h"
 
 int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
   FILE* f = fopen(file_name, "r");
@@ -21,6 +21,27 @@ int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichie
   fclose(f);
 
   return table;
+}
+
+table_l_code* creer_table_arbre(pnoeud_t racine){
+  table_l_code* tab = malloc(256*sizeof(4*uint64+int+char));
+  pnoeud_t bl = racine;
+  save = tab;
+  int i=0;
+  while(bl!=NULL){
+    while((bl->fgauche!=NULL)&&(bl->fdroit!=NULL)){
+      if(bl->fdroit != NULL){
+        bl = bl->fdroit;
+      }
+      else if (bl->fgauche!=NULL){
+        bl = bl->fgauche;
+      }
+      i++;
+    }
+    tab[i]->symbole=bl->c;
+    //et pour le reste idk
+  }
+  return save;
 }
 
 
