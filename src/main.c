@@ -79,6 +79,7 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
   for (; i < 256; i++) {
     if (occurence[i] != 0) {
       pnoeud_t noeud = creer_noeud(occurence[i]);
+      noeud->c = i;
       noeud_crt->suiv = noeud;
       noeud_crt = noeud;
     }
@@ -114,16 +115,15 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   return liste->tete;
 }
 
-uint256_t decalage_256(uint256_t valeur) {
-  valeur[3] <<= 1;
-  valeur[2] <<= 1;
-  valeur[1] <<= 1;
-  valeur[0] <<= 1;
-  return valeur;
+void decalage_256(uint256_t valeur, uint256_t valeur_decalee) {
+  valeur_decalee[3] << valeur[3] << 1;
+  valeur_decalee[2] << valeur[2] << 1;
+  valeur_decalee[1] << valeur[1] << 1;
+  valeur_decalee[0] << valeur[0] << 1;
 }
 
-pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractère) {
-  pcodage_t table = malloc(sizeof(codage_t) * nombre_carractère);
+pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere) {
+  pcodage_t table = malloc(sizeof(codage_t) * nombre_carractere);
   arbre_to_table_Worker(racine, 0, 0, table, 0);
   return table;
 }
@@ -138,9 +138,14 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
       table[indice].longueur = profondeur;
       indice++;
     } else {
-      arbre_to_table_Worker(racine->fgauche, indice, decalage_256(valeur) + 1,
+        uint256_t valeur_decalee1;
+        uint256_t valeur_decalee2;
+         decalage_256(valeur, valeur_decalee1);
+          decalage_256(valeur, valeur_decalee2);
+          valeur_decalee1[0]++;
+      arbre_to_table_Worker(racine->fgauche, indice, valeur_decalee1,
                             table, profondeur + 1);
-      arbre_to_table_Worker(racine->fdroit, indice, decalage_256(valeur), table,
+      arbre_to_table_Worker(racine->fdroit, indice, valeur_decalee2, table,
                             profondeur + 1);
     }
   }
@@ -176,17 +181,17 @@ void afficher_arbre(pnoeud_t a, int niveau) {
 
 void test_conversion_tableau_liste() {
   int *occ = malloc(sizeof(int) * 256);
-  occ[2] = 1;
-  occ[10] = 1;
-  occ[240] = 1;
-  occ[248] = 1;
-  occ[3] = 1;
+  occ[37] = 1;
+  occ[38] = 1;
+  occ[39] = 1;
+  occ[40] = 1;
+  occ[41] = 1;
   pnoeud_t racine = creer_arbre_quelconque(occ);
   afficher_arbre(racine, 0);
-  pcodage_t = arbre_to_table(racine, 5);
+  pcodage_t tableau = arbre_to_table(racine, 5);
 
   for (int i = 0; i < 5; i++) {
-    printf("char:%c  -->  code:%ld \n", pcodage_t[i]->c, pcodage_t[i]->code[0]);
+    printf("char:%c  -->  code:%ld \n", tableau[i].c, tableau[i].code[0]);
   }
 }
 
