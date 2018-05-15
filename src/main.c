@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+////////////////////////////////
+/* FONCTION ELEMENTAIRE NOEUD */
+////////////////////////////////
+
 pnoeud_t creer_noeud(int poids) {
   pnoeud_t noeud = malloc(sizeof(noeud_t));
   noeud->poids = poids;
@@ -14,6 +18,10 @@ void ajouter_queue(pnoeud_t noeud, pliste_t liste) {
   liste->queue->suiv = noeud;
   liste->queue = noeud;
 }
+
+////////////////////////////////
+/*      FONCTION CONVERSION   */
+////////////////////////////////
 
 void conversion_tableau_liste(int *occurence, pliste_t liste) {
   int i = 0;
@@ -33,6 +41,10 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
   }
   liste->queue = noeud_crt;
 }
+
+////////////////////////////////
+/*   FONCTION CREATION ARBRE  */
+////////////////////////////////
 
 pnoeud_t creer_arbre_canonique(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
