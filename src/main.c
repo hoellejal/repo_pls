@@ -15,8 +15,12 @@ pnoeud_t creer_noeud(int poids) {
 }
 
 void ajouter_queue(pnoeud_t noeud, pliste_t liste) {
-  liste->queue->suiv = noeud;
-  liste->queue = noeud;
+  if (liste->tete == NULL) {
+    liste->tete = liste->queue = noeud;
+  } else {
+    liste->queue->suiv = noeud;
+    liste->queue = noeud;
+  }
 }
 
 pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
@@ -90,7 +94,7 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
 
-  while (lste->tete != NULL && liste->tete != liste->queue) {
+  while (liste->tete != NULL && liste->tete != liste->queue) {
     pnoeud_t noeud1 = retirer_noeud(get_noeud_min(liste), liste);
     pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
     if (noeud1 != NULL && noeud2 != NULL) {
