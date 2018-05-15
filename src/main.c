@@ -111,13 +111,14 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
     printf("Tete : %i \n", liste->tete->poids);
     printf("Queue : %i \n", liste->queue->poids);
   }
-
   return liste->tete;
 }
 
+
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractère) {
   pcodage_t table = malloc(sizeof(codage_t) * nombre_carractère);
-  return arbre_to_table_Worker(racine, 0, 0, table, 0);
+  arbre_to_table_Worker(racine, 0, 0, table, 0);
+  return table;
 }
 
 void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
@@ -136,7 +137,7 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
                             profondeur + 1);
     }
   }
-
+}
   ////////////////////////////////
   /* FONCTION TEST */
   ////////////////////////////////
