@@ -13,7 +13,7 @@ typedef struct n {
 typedef struct {
     pnoeud_t tete;
     pnoeud_t queue;
-} liste_t, pliste_t;
+} liste_t, *pliste_t;
 
 
 #endif
