@@ -1,6 +1,8 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
+typedef uint64_t uint256_t[4];
+
 typedef struct n {
     struct n *parent;
     struct n *fgauche;
@@ -14,6 +16,11 @@ typedef struct {
     pnoeud_t tete;
     pnoeud_t queue;
 } liste_t, *pliste_t;
+
+typedef struct {
+  char c;
+  uint256_t code;
+} codage_t , *pcodage_t;
 
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */

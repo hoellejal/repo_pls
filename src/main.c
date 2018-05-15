@@ -26,8 +26,12 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
       return noeud;
     } else {
       pnoeud_t noeud_courant = liste->tete;
-      while (noeud_courant->suiv != NULL && noeud_courant->suiv != noeud) {
+      while (noeud_courant->suiv != liste->queue &&
+             noeud_courant->suiv != noeud) {
         noeud_courant = noeud_courant->suiv;
+      }
+      if (noeud == liste->queue) {
+        liste->queue == noeud_courant;
       }
       noeud_courant->suiv = noeud_courant->suiv->suiv;
       return noeud;
@@ -102,10 +106,11 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   return liste->tete;
 }
 
-////////////////////////////////
-/* FONCTION TEST */
-////////////////////////////////
-void afficher_liste_noeud(pliste_t liste) {
+pcodage_t arbre_to_table()
+    ////////////////////////////////
+    /* FONCTION TEST */
+    ////////////////////////////////
+    void afficher_liste_noeud(pliste_t liste) {
   if (!liste)
     return;
   pnoeud_t n = liste->tete;
