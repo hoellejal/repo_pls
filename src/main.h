@@ -1,5 +1,6 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
+#include <stdint.h>
 
 typedef uint64_t uint256_t[4];
 
@@ -26,7 +27,7 @@ typedef struct {
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
 pnoeud_t creer_noeud(int poids);
-ajouter_queue(pnoeud_t noeud, pliste_t liste);
+void ajouter_queue(pnoeud_t noeud, pliste_t liste);
 pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste);
 pnoeud_t get_noeud_min(pliste_t liste);
 
