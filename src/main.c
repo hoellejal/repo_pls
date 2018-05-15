@@ -4,17 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void afficher_liste_noeud(pliste_t liste) {
-    if(!liste)
-        return ;
-    pnoeud_t n = liste->tete;
-    while(n != NULL) {
-        printf("%d | ", n->poids);
-        n = n->suiv;
-    }
-    printf("\n");
-}
-
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
@@ -28,6 +17,41 @@ pnoeud_t creer_noeud(int poids) {
 void ajouter_queue(pnoeud_t noeud, pliste_t liste) {
   liste->queue->suiv = noeud;
   liste->queue = noeud;
+}
+
+pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
+  if (liste->tete != NULL) {
+    if (noeud == liste->tete) {
+      liste->tete = liste->tete->suiv;
+      return noeud;
+    } else {
+      pnoeud_t noeud_courant = liste->tete;
+      while (noeud_courant->suiv != NULL && noeud_courant->suiv != noeud) {
+        noeud_courant = noeud_courant->suiv;
+      }
+      noeud_courant->suiv = noeud_courant->suiv->suiv;
+      return noeud;
+    }
+  } else {
+    return NULL;
+  }
+}
+
+pnoeud_t get_noeud_min(pliste_t liste) {
+  if (liste->tete != NULL) {
+    pnoeud_t noeud_courant = liste->tete;
+    pnoeud_t noeud_min = noeud_courant;
+    noeud_courant = noeud_courant->suiv;
+    while (noeud_courant != NULL) {
+      if (noeud_min->poids > noeud_courant->poids) {
+        noeud_min = noeud_courant;
+      }
+      noeud_courant = noeud_courant->suiv;
+    }
+    return noeud_min;
+  } else {
+    return NULL;
+  }
 }
 
 ////////////////////////////////
@@ -62,25 +86,45 @@ pnoeud_t creer_arbre_canonique(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
 
-  //TEST
+  while (liste->tete != liste->queue) {
+    pnoeud_t noeud1 = retirer_noeud(get_noeud_min(liste), liste);
+    pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
+    if (noeud1 != NULL && noeud2 != NULL) {
+      pnoeud_t parent = creer_noeud(noeud1->poids + noeud2->poids);
+      parent->fgauche = noeud1;
+      parent->fdroit = noeud2;
+      noeud1->parent = parent;
+      noeud2->parent = parent;
+      ajouter_queue(parent, liste);
+    }
+  }
   afficher_liste_noeud(liste);
 }
 
-
-
-void test_conversion_tableau_liste() {
-    int *occ = malloc(sizeof(int) * 256);
-    occ[2] = 5;
-    occ[10] = 59;
-    occ[240] = 9;
-    creer_arbre_canonique(occ);
+////////////////////////////////
+/* FONCTION TEST */
+////////////////////////////////
+void afficher_liste_noeud(pliste_t liste) {
+  if (!liste)
+    return;
+  pnoeud_t n = liste->tete;
+  while (n != NULL) {
+    printf("%d | ", n->poids);
+    n = n->suiv;
+  }
+  printf("\n");
 }
 
-
+void test_conversion_tableau_liste() {
+  int *occ = malloc(sizeof(int) * 256);
+  occ[2] = 5;
+  occ[10] = 59;
+  occ[240] = 9;
+  creer_arbre_canonique(occ);
+}
 
 int main(int argc, char const *argv[]) {
-    test_conversion_tableau_liste();
-
+  test_conversion_tableau_liste();
 
   return 0;
 }
