@@ -90,7 +90,7 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
 
-  while (liste->tete != liste->queue) {
+  while (lste->tete != NULL && liste->tete != liste->queue) {
     pnoeud_t noeud1 = retirer_noeud(get_noeud_min(liste), liste);
     pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
     if (noeud1 != NULL && noeud2 != NULL) {
