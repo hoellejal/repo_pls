@@ -125,7 +125,7 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
 
   if (racine != NULL) {
     if (racine->fdroit == NULL && racine->fgauche == NULL) {
-      table[i]->c = racine.c;
+      table[i]->c = racine->c;
       table[i]->code = valeur;
       table[i]->longueur = profondeur;
       indice++;
@@ -174,6 +174,12 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
     occ[3] = 1;
     pnoeud_t racine = creer_arbre_quelconque(occ);
     afficher_arbre(racine, 0);
+    pcodage_t = arbre_to_table(racine, 5);
+
+    for (int i = 0; i < 5; i++) {
+      printf("char:%c  -->  code:%ld \n", pcodage_t[i]->c,
+             pcodage_t[i]->code[0]);
+    }
   }
 
   int main(int argc, char const *argv[]) {
