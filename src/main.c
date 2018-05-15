@@ -24,7 +24,7 @@ int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichie
 }
 
 table_l_code* creer_table_arbre(pnoeud_t racine){
-  table_l_code* tab = malloc(256*sizeof(4*uint64+int+char));
+  table_l_code* tab = malloc(256*sizeof(table_l_code));
   pnoeud_t bl = racine;
   save = tab;
   int i=0;
@@ -44,7 +44,7 @@ table_l_code* creer_table_arbre(pnoeud_t racine){
   return tab;
 }
 
-*/
+
 int main(int argc, char const *argv[]) {
   int* t = table_pourcentage_huffman(argv[1]);
  // for (int i=0; i<256;i++){
