@@ -106,11 +106,11 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   return liste->tete;
 }
 
-pcodage_t arbre_to_table()
-    ////////////////////////////////
-    /* FONCTION TEST */
-    ////////////////////////////////
-    void afficher_liste_noeud(pliste_t liste) {
+pcodage_t arbre_to_table() {}
+////////////////////////////////
+/* FONCTION TEST */
+////////////////////////////////
+void afficher_liste_noeud(pliste_t liste) {
   if (!liste)
     return;
   pnoeud_t n = liste->tete;
