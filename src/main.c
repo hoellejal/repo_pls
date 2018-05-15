@@ -115,8 +115,8 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
 }
 
 
-pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractère) {
-  pcodage_t table = malloc(sizeof(codage_t) * nombre_carractère);
+pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere) {
+  pcodage_t table = malloc(sizeof(codage_t) * nombre_carractere);
   arbre_to_table_Worker(racine, 0, 0, table, 0);
   return table;
 }
@@ -126,9 +126,9 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
 
   if (racine != NULL) {
     if (racine->fdroit == NULL && racine->fgauche == NULL) {
-      table[i]->c = racine->c;
-      table[i]->code = valeur;
-      table[i]->longueur = profondeur;
+      table[indice].c = racine->c;
+      table[indice].code[0] = valeur[0];
+      table[indice].longueur = profondeur;
       indice++;
     } else {
       arbre_to_table_Worker(racine->fgauche, indice, (valeur << 1) + 1, table,

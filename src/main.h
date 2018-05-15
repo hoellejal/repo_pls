@@ -37,6 +37,11 @@ pnoeud_t get_noeud_min(pliste_t liste);
 ////////////////////////////////
 void conversion_tableau_liste(int *occurence, pliste_t liste);
 
+pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
+
+void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
+                           pcodage_t table, int profondeur);
+
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
