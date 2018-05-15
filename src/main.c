@@ -14,7 +14,7 @@ int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichie
   for (int i = 0; i < 256; i++) {
     table[i] = 0;
   }
-  char c;
+  int c;
   while ((c = fgetc(f)) != EOF) {
     table[c]++;
   }
