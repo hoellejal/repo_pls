@@ -71,11 +71,13 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
   while (occurence[i] == 0) {
     i++;
   }
-  pnoeud_t noeud = creer_noeud(occurence[i]);
-  liste->tete = noeud;
-  pnoeud_t noeud_crt = liste->tete;
   i++;
+  
+  pnoeud_t noeud = creer_noeud(occurence[i]);
+  noeud->c = i;
+  liste->tete = noeud;
 
+  pnoeud_t noeud_crt = liste->tete;
   for (; i < 256; i++) {
     if (occurence[i] != 0) {
       pnoeud_t noeud = creer_noeud(occurence[i]);
