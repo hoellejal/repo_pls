@@ -109,56 +109,75 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
 
     afficher_liste_noeud(liste);
     printf("Tete : %i \n", liste->tete->poids);
-    printf("Tete : %i \n", liste->queue->poids);
+    printf("Queue : %i \n", liste->queue->poids);
   }
-
 
   return liste->tete;
-
 }
 
-pcodage_t arbre_to_table();
-    ////////////////////////////////
-    /* FONCTION TEST */
-    ////////////////////////////////
-void afficher_liste_noeud(pliste_t liste) {
-  if (!liste)
-    return;
-  pnoeud_t n = liste->tete;
-  while (n != NULL) {
-    printf("%d | ", n->poids);
-    n = n->suiv;
-  }
-  printf("\n");
-
+pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractère) {
+  pcodage_t table = malloc(sizeof(codage_t) * nombre_carractère);
+  return arbre_to_table_Worker(racine, 0, 0, table, 0);
 }
 
-void afficher_arbre(pnoeud_t a, int niveau) {
-    int i ;
-    if (a != NULL) {
-        afficher_arbre (a->fdroit, niveau+1) ;
+void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
+                           pcodage_t table, int profondeur) {
 
-        for (i = 0; i < niveau; i++)
-            printf ("\t");
-
-        printf (" %d (%d)\n\n", a->poids, niveau) ;
-        afficher_arbre (a->fgauche, niveau+1) ;
+  if (racine != NULL) {
+    if (racine->fdroit == NULL && racine->fgauche == NULL) {
+      table[i]->c = racine.c;
+      table[i]->code = valeur;
+      table[i]->longueur = profondeur;
+      indice++;
+    } else {
+      arbre_to_table_Worker(racine->fgauche, indice, (valeur << 1) + 1, table,
+                            profondeur + 1);
+      arbre_to_table_Worker(racine->fdroit, indice, (valeur << 1), table,
+                            profondeur + 1);
     }
-}
+  }
 
-void test_conversion_tableau_liste() {
-  int *occ = malloc(sizeof(int) * 256);
-  occ[2] = 1;
-  occ[10] = 1;
-  occ[240] = 1;
-  occ[248] = 1;
-  occ[3] = 1;
-  pnoeud_t racine = creer_arbre_quelconque(occ);
-  afficher_arbre(racine, 0);
-}
+  ////////////////////////////////
+  /* FONCTION TEST */
+  ////////////////////////////////
 
-int main(int argc, char const *argv[]) {
-  test_conversion_tableau_liste();
+  void afficher_liste_noeud(pliste_t liste) {
+    if (!liste)
+      return;
+    pnoeud_t n = liste->tete;
+    while (n != NULL) {
+      printf("%d | ", n->poids);
+      n = n->suiv;
+    }
+    printf("\n");
+  }
 
-  return 0;
-}
+  void afficher_arbre(pnoeud_t a, int niveau) {
+    int i;
+    if (a != NULL) {
+      afficher_arbre(a->fdroit, niveau + 1);
+
+      for (i = 0; i < niveau; i++)
+        printf("\t");
+
+      printf(" %d (%d)\n\n", a->poids, niveau);
+      afficher_arbre(a->fgauche, niveau + 1);
+    }
+  }
+
+  void test_conversion_tableau_liste() {
+    int *occ = malloc(sizeof(int) * 256);
+    occ[2] = 1;
+    occ[10] = 1;
+    occ[240] = 1;
+    occ[248] = 1;
+    occ[3] = 1;
+    pnoeud_t racine = creer_arbre_quelconque(occ);
+    afficher_arbre(racine, 0);
+  }
+
+  int main(int argc, char const *argv[]) {
+    test_conversion_tableau_liste();
+
+    return 0;
+  }

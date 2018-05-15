@@ -21,6 +21,7 @@ typedef struct {
 typedef struct {
   char c;
   uint256_t code;
+  uint8_t longueur;
 } codage_t , *pcodage_t;
 
 ////////////////////////////////
