@@ -33,10 +33,14 @@ void conversion_tableau_liste(int *occurence, pliste_t liste);
 ////////////////////////////////
 
 pnoeud_t creer_arbre_quelconque(int *occurence);
+pnoeud_t convertion_canonique(int *occurence);
 
 ////////////////////////////////
 /* FONCTION TEST */
 ////////////////////////////////
 void afficher_liste_noeud(pliste_t liste);
 void test_conversion_tableau_liste();
+
+
+
 #endif
