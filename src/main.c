@@ -28,10 +28,9 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
     if (noeud == liste->tete) {
       liste->tete = liste->tete->suiv;
       return noeud;
-    } else {
+    }else {
       pnoeud_t noeud_courant = liste->tete;
-      while (noeud_courant->suiv != liste->queue &&
-             noeud_courant->suiv != noeud) {
+      while (noeud_courant->suiv != liste->queue && noeud_courant->suiv != noeud) {
         noeud_courant = noeud_courant->suiv;
       }
       if (noeud == liste->queue) {
@@ -40,7 +39,7 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
       noeud_courant->suiv = noeud_courant->suiv->suiv;
       return noeud;
     }
-  } else {
+  }else {
     return NULL;
   }
 }
@@ -72,7 +71,7 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
     i++;
   }
   i++;
-  
+
   pnoeud_t noeud = creer_noeud(occurence[i]);
   noeud->c = i;
   liste->tete = noeud;
@@ -131,7 +130,7 @@ pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere) {
 }
 
 void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
-                           pcodage_t table, int profondeur) {
+  pcodage_t table, int profondeur) {
 
   if (racine != NULL) {
     if (racine->fdroit == NULL && racine->fgauche == NULL) {
@@ -140,26 +139,36 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
       table[indice].longueur = profondeur;
       indice++;
     } else {
-        uint256_t valeur_decalee1;
-        uint256_t valeur_decalee2;
-         decalage_256(valeur, valeur_decalee1);
-          decalage_256(valeur, valeur_decalee2);
-          valeur_decalee1[0]++;
+      uint256_t valeur_decalee1;
+      uint256_t valeur_decalee2;
+      decalage_256(valeur, valeur_decalee1);
+      decalage_256(valeur, valeur_decalee2);
+      valeur_decalee1[0]++;
       arbre_to_table_Worker(racine->fgauche, indice, valeur_decalee1,
-                            table, profondeur + 1);
+      table, profondeur + 1);
       arbre_to_table_Worker(racine->fdroit, indice, valeur_decalee2, table,
-                            profondeur + 1);
+      profondeur + 1);
     }
   }
 }
-//
+
+
+pcodage_t table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table) {
+  pcodage_t table_canonique = malloc(sizeof(pcodage_t) * longueur_table);
+
+  for(int i = 0; i<longueur_table; i++) {
+    // tri tableau et affection to canonique
+  }
+  return table_canonique;
+}
+
 ////////////////////////////////
 /* FONCTION TEST */
 ////////////////////////////////
 
 void afficher_liste_noeud(pliste_t liste) {
   if (!liste)
-    return;
+  return;
   pnoeud_t n = liste->tete;
   while (n != NULL) {
     printf("%d | ", n->poids);
@@ -174,12 +183,12 @@ void afficher_arbre(pnoeud_t a, int niveau) {
     afficher_arbre(a->fdroit, niveau + 1);
 
     for (i = 0; i < niveau; i++)
-      printf("\t");
+    printf("\t");
 
     printf(" %d (%d)\n\n", a->poids, niveau);
     afficher_arbre(a->fgauche, niveau + 1);
   }
-}
+      }
 
 void test_conversion_tableau_liste() {
   int *occ = malloc(sizeof(int) * 256);
