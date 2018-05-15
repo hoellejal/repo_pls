@@ -82,7 +82,7 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
 
-pnoeud_t creer_arbre_canonique(int *occurence) {
+pnoeud_t creer_arbre_quelconque(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
 
@@ -99,6 +99,7 @@ pnoeud_t creer_arbre_canonique(int *occurence) {
     }
   }
   afficher_liste_noeud(liste);
+  return liste->tete;
 }
 
 ////////////////////////////////

@@ -15,5 +15,28 @@ typedef struct {
     pnoeud_t queue;
 } liste_t, *pliste_t;
 
+////////////////////////////////
+/* FONCTION ELEMENTAIRE NOEUD */
+////////////////////////////////
+pnoeud_t creer_noeud(int poids);
+ajouter_queue(pnoeud_t noeud, pliste_t liste);
+pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste);
+pnoeud_t get_noeud_min(pliste_t liste);
 
+////////////////////////////////
+/*      FONCTION CONVERSION   */
+////////////////////////////////
+void conversion_tableau_liste(int *occurence, pliste_t liste);
+
+////////////////////////////////
+/*   FONCTION CREATION ARBRE  */
+////////////////////////////////
+
+pnoeud_t creer_arbre_quelconque(int *occurence);
+
+////////////////////////////////
+/* FONCTION TEST */
+////////////////////////////////
+void afficher_liste_noeud(pliste_t liste);
+void test_conversion_tableau_liste();
 #endif
