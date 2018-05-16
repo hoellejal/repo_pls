@@ -24,6 +24,11 @@ typedef struct {
   uint8_t longueur;
 } codage_t , *pcodage_t;
 
+typedef struct {
+  char c;
+  uint8_t longueur;
+} codage_canonique_t , *pcodage_canonique_t;
+
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
@@ -44,7 +49,7 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur,
 
 void decalage_256(uint256_t valeur, uint256_t valeur_decalee);
 
-pcodage_t table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table);
+pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table);
 
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
