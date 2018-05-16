@@ -31,7 +31,7 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
 
   char* comp_name = malloc(strlen(file_name) + 4);
   strcpy(comp_name,file_name);
-  strcat(comp_name,".xxx")
+  strcat(comp_name,".xxx");
   FILE* fw = fopen(comp_name, "w");
   fprintf(fw,"%d",nb_codage);
   for (int i = 0; i < nb_codage; i++) {
@@ -44,6 +44,7 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
   codage_t code;
   int i;
   uint64_t buffer = 0;
+  uint64_t save,mask;
   while (((c = fgetc(fr)) != EOF)) {
     i=0;
     while(codage[i].c != c){
@@ -61,30 +62,56 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
       tab_poids_fort = code.longueur / 64;
       nb_bits_fort = code.longueur % 64;
       decalage = nb_bits_fort - nb_bits_restant;
+      mask = ((1 << decalage) - 1);
       if (decalage > 0) {
-        
+        save = code.code[0] & mask;
+        for (int i = 0; i < tab_poids_fort; i++) {
+          code.code[i] >>= decalage;
+          if (i+1 != tab_poids_fort) {
+            code.code[i] |= (code.code[i+1] & mask) << (64 - decalage);
+          }
+        }
+        buffer |= code.code[tab_poids_fort] >> decalage;
+        ecrire_buffer(fw,&buffer);
+        for(int i = tab_poids_fort - 1; i >= 0; i++){
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        buffer = save << (64 - decalage);
+        nb_bits_restant = 64 - decalage;
+      }
+      else if (decalage == 0) {
+        buffer |= code.code[tab_poids_fort] & ((1 << nb_bits_restant) - 1);
+        ecrire_buffer(fw,&buffer);
+        for(int i = tab_poids_fort - 1; i >= 0; i++){
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        nb_bits_restant = 64;
+      }
+      else {
+        decalage = -decalage;
+        code.code[tab_poids_fort] <<= decalage;
+        code.code[tab_poids_fort] |= (code.code[tab_poids_fort-1] >> (64 - decalage));
+        buffer |= code.code[tab_poids_fort];
+        ecrire_buffer(fw,&code.code[tab_poids_fort]);
+        for (int i = tab_poids_fort - 1; i > 0; i++) {
+          code.code[i] <<= decalage;
+          code.code[i] |= (code.code[i-1] >> (64 - decalage));
+          buffer |= code.code[i];
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        code.code[0] <<= decalage;
+        buffer |= code.code[0];
+        nb_bits_restant = decalage;
       }
     }
-
   }
   fclose(fr);
   fclose(fw);
 
-/* pour écriture: FILE *fp;
-  fp = fopen( "compressed_file.txt" , "w" );
-  fwrite(string où prendre les infos, 1(taille en octets) , sizeof(string) , fp );
-  fclose(fp);*/
   return 1;
 }
 
 int main(int argc, char const *argv[]) {
-  pcodage_t ugh=malloc(4*sizeof(pcodage_t));
-  ugh[0].c='f';
-  ugh[0].code[0]=0101;
-  ugh[0].longueur=4;
-  ugh[1].c='h';
-  ugh[1].code[0]=101;
-  ugh[1].longueur=3;
-  int a = ecrire_fichier_compresse(ugh,argv[1]);
+
   return 0;
 }
