@@ -8,7 +8,7 @@
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
 
-pnoeud_t creer_noeud(int poids) {
+pnoeud_t creer_noeud(uint64_t poids) {
   pnoeud_t noeud = malloc(sizeof(noeud_t));
   noeud->poids = poids;
   return noeud;
@@ -28,9 +28,10 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
     if (noeud == liste->tete) {
       liste->tete = liste->tete->suiv;
       return noeud;
-    }else {
+    } else {
       pnoeud_t noeud_courant = liste->tete;
-      while (noeud_courant->suiv != liste->queue && noeud_courant->suiv != noeud) {
+      while (noeud_courant->suiv != liste->queue &&
+             noeud_courant->suiv != noeud) {
         noeud_courant = noeud_courant->suiv;
       }
       if (noeud == liste->queue) {
@@ -39,7 +40,7 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
       noeud_courant->suiv = noeud_courant->suiv->suiv;
       return noeud;
     }
-  }else {
+  } else {
     return NULL;
   }
 }
@@ -121,57 +122,95 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
   return liste->tete;
 }
 
-void decalage_256(uint256_t valeur, uint256_t valeur_decalee) {
-  valeur_decalee[3] << valeur[3] << 1;
-  valeur_decalee[2] << valeur[2] << 1;
-  valeur_decalee[1] << valeur[1] << 1;
-  valeur_decalee[0] << valeur[0] << 1;
+void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2,
+                  uint64_t *valeur3) {
+  uint64_t masque = 1;
+  masque <<= 63;
+
+  *valeur3 <<= 1;
+  if ((*valeur2 & masque) != 0) {
+    *valeur3 += 1;
+  }
+  *valeur2 <<= 1;
+
+  if ((*valeur1 & masque) != 0) {
+    *valeur2 += 1;
+  }
+  *valeur1 <<= 1;
+
+  if ((*valeur0 & masque) != 0) {
+    *valeur1 += 1;
+  }
+  *valeur0 <<= 1;
 }
 
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere) {
   pcodage_t table = malloc(sizeof(codage_t) * nombre_carractere);
-  arbre_to_table_Worker(racine, 0, 0, table, 0);
+  int indice = 0;
+  arbre_to_table_Worker(racine, &indice, 0, 0, 0, 0, table, 0);
   return table;
 }
 
-void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur, pcodage_t table, int profondeur) {
+void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0,
+                           uint64_t valeur1, uint64_t valeur2, uint64_t valeur3,
+                           pcodage_t table, int profondeur) {
 
   if (racine != NULL) {
-    if (racine->fdroit == NULL && racine->fgauche == NULL) {
-      // DEBUT TEST
-      //Possibilité par folle pour ajouter en fin de tableau :
-      while(table[indice].c != '\0')
-        indice++;
-      // FIN TEST
 
-      table[indice].c = racine->c;
-      table[indice].code[0] = valeur[0];
-      table[indice].longueur = profondeur;
-      indice++; //Romain : Vu que vous ne rappelez pas la fonction worker dans le if, ca ne sert a rien d'incrementer indice, et il vaudra toujours 0 du coup
+    if (racine->fdroit == NULL && racine->fgauche == NULL) {
+      table[*indice].c = racine->c;
+      table[*indice].code[0] = valeur0;
+      table[*indice].code[1] = valeur1;
+      table[*indice].code[2] = valeur2;
+      table[*indice].code[3] = valeur3;
+      table[*indice].longueur = profondeur;
+      *indice = *indice + 1;
     } else {
-      uint256_t valeur_decalee1;
-      uint256_t valeur_decalee2;
-      decalage_256(valeur, valeur_decalee1);
-      decalage_256(valeur, valeur_decalee2);
-      valeur_decalee1[0]++;
-      arbre_to_table_Worker(racine->fgauche, indice, valeur_decalee1, table, profondeur + 1);
-      arbre_to_table_Worker(racine->fdroit, indice, valeur_decalee2, table, profondeur + 1);
+      decalage_256(&valeur0, &valeur1, &valeur2, &valeur3);
+
+      arbre_to_table_Worker(racine->fdroit, indice, valeur0, valeur1, valeur2,
+                            valeur3, table, profondeur + 1);
+      arbre_to_table_Worker(racine->fgauche, indice, valeur0 + 1, valeur1,
+                            valeur2, valeur3, table, profondeur + 1);
     }
   }
 }
 
+void tri_tableau(pcodage_t table, int taille) {
+
+  for (int i = 0; i < taille; i++) {
+    for (int j = 1; j < taille - i; j++) {
+      if (table[j - 1].longueur > table[j].longueur) {
+        codage_t tampon = table[j - 1];
+        table[j - 1] = table[j];
+        table[j] = tampon;
+      }
+    }
+  }
+}
+// MEMO
+// Creation structure codage canonique
+// Creation fonction table quelquonque to canonique
+// Affichage des caractère pour les noeuds feuilles
 
 
 /**
- * \brief    Retourne une table de huffman canonique à partir d'une table quelconque
- * \details  A partir d'une tableau quelconque de huffman (caractère, code, lonugueur du code => codage_t) on retourne une table de Huffman canonique (caractère, longueur du code => codage_canonique_t). Les éléments de la table du huffman quelconque de même longueure doivent être contigus.
- * \param    table_quelconque    Tableau de codage des caractères, les éléments de même longueur de code sont contigus.
+ * \brief    Retourne une table de huffman canonique à partir d'une table
+ * quelconque
+ * \details  A partir d'une tableau quelconque de huffman (caractère, code,
+ * lonugueur du code => codage_t) on retourne une table de Huffman canonique
+ * (caractère, longueur du code => codage_canonique_t). Les éléments de la table
+ * du huffman quelconque de même longueure doivent être contigus.
+ * \param    table_quelconque    Tableau de codage des caractères, les éléments
+ * de même longueur de code sont contigus.
  * \param    longueur_table      Taille du tableau table_quelconque
  * \return   Table de huffman canonique (caractère, longueur de code)
  */
-pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table) {
+pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque,
+                                                  int longueur_table) {
 
-  pcodage_canonique_t table_canonique = malloc(sizeof(codage_canonique_t) * longueur_table);
+  pcodage_canonique_t table_canonique =
+      malloc(sizeof(codage_canonique_t) * longueur_table);
 
   int a = 0, b = 0;
   int max;
@@ -205,10 +244,10 @@ pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, in
 
 void afficher_liste_noeud(pliste_t liste) {
   if (!liste)
-  return;
+    return;
   pnoeud_t n = liste->tete;
   while (n != NULL) {
-    printf("%d | ", n->poids);
+    printf("%lu | ", n->poids);
     n = n->suiv;
   }
   printf("\n");
@@ -220,43 +259,61 @@ void afficher_arbre(pnoeud_t a, int niveau) {
     afficher_arbre(a->fdroit, niveau + 1);
 
     for (i = 0; i < niveau; i++)
-    printf("\t");
+      printf("\t");
 
-    printf(" %d %c (%d)\n\n", a->poids, a->c, niveau);
+    printf(" %lu %c (%d)\n\n", a->poids, a->c, niveau);
     afficher_arbre(a->fgauche, niveau + 1);
   }
 }
 
 void test_conversion_tableau_liste() {
-  int *occ = malloc(sizeof(int) * 256);
-  occ['a'] = 1;
-  occ['b'] = 1;
-  occ['c'] = 1;
-  occ['d'] = 1;
-  occ['e'] = 1;
+  uint64_t *occ = malloc(sizeof(uint64_t) * 256);
+  uint64_t occurence = 1;
+  for (int i = 33; i <= 126; i++) {
+    occ[i] = occurence;
+    occurence += 20;
+  }
   pnoeud_t racine = creer_arbre_quelconque(occ);
   afficher_arbre(racine, 0);
-  //pcodage_t tableau = arbre_to_table(racine, 5);
-
-  pcodage_t test = malloc(sizeof(codage_t)*6);
-  codage_t p1; p1.c = 'a'; p1.longueur = 1; p1.code[0] = 1;
-  codage_t p2; p2.c = 'b'; p2.longueur = 2; p2.code[0] = 2;
-  codage_t p3; p3.c = 'c'; p3.longueur = 2; p3.code[0] = 3;
-  codage_t p4; p4.c = 'd'; p4.longueur = 2; p4.code[0] = 4;
-  codage_t p5; p5.c = 'e'; p5.longueur = 2; p5.code[0] = 5;
-  codage_t p6; p6.c = 'f'; p6.longueur = 6; p6.code[0] = 6;
-  test[0] = p6;
-  test[1] = p3;
-  test[2] = p2;
-  test[3] = p4;
-  test[4] = p5;
-  test[5] = p1;
-
-  pcodage_canonique_t trie ;
-  trie = table_quelconque_to_canonique(test, 6);
-
-  for (int i = 0; i < 6; i++) {
-    printf("char: %c  -->  code: %ld \n", trie[i].c, trie[i].longueur);
+  pcodage_t tableau = arbre_to_table(racine, 94);
+  //
+  // pcodage_t test = malloc(sizeof(codage_t) * 6);
+  // codage_t p1;
+  // p1.c = 'a';
+  // p1.longueur = 2;
+  // p1.code[0] = 1;
+  // codage_t p2;
+  // p2.c = 'b';
+  // p2.longueur = 2;
+  // p2.code[0] = 2;
+  // codage_t p3;
+  // p3.c = 'c';
+  // p3.longueur = 2;
+  // p3.code[0] = 3;
+  // codage_t p4;
+  // p4.c = 'd';
+  // p4.longueur = 3;
+  // p4.code[0] = 4;
+  // codage_t p5;
+  // p5.c = 'e';
+  // p5.longueur = 3;
+  // p5.code[0] = 5;
+  // codage_t p6;
+  // p6.c = 'f';
+  // p6.longueur = 4;
+  // p6.code[0] = 6;
+  // test[0] = p1;
+  // test[1] = p1;
+  // test[2] = p1;
+  // test[3] = p1;
+  // test[4] = p1;
+  // test[5] = p1;
+  // table_quelconque_to_canonique(test, 6);
+  tri_tableau(tableau, 94);
+  for (int i = 0; i <= 93; i++) {
+    printf("char: %c  -->  code: %lu|%lu|%lu|%lu longueur: %d \n", tableau[i].c,
+           tableau[i].code[0], tableau[i].code[1], tableau[i].code[2],
+           tableau[i].code[3], tableau[i].longueur);
   }
 }
 
