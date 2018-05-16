@@ -156,10 +156,7 @@ void arbre_to_table_Worker(pnoeud_t racine, int indice, uint256_t valeur, pcodag
   }
 }
 
-// MEMO
-// Creation structure codage canonique
-// Creation fonction table quelquonque to canonique
-// Affichage des caractère pour les noeuds feuilles
+
 
 /**
  * \brief    Retourne une table de huffman canonique à partir d'une table quelconque
@@ -172,26 +169,28 @@ pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, in
 
   pcodage_canonique_t table_canonique = malloc(sizeof(codage_canonique_t) * longueur_table);
 
-  int a, b;
-  int i, j;
-  char min;
+  int a = 0, b = 0;
+  int max;
 
-  while(j < longueur_table) { // Parcour de tous les sous tableaux de table quelconque (code de même longueur)
+  while(b < longueur_table) {
+    while(table_quelconque[b].longueur == table_quelconque[b+1].longueur) // borne supérieur du sous tableau
+      b++;
 
-    while(b > a) { // Algorithme de tri du sous tableau de a à b de table quelconque dans table canonique de a à b
-      min = table_quelconque[a].c;
-      i = a + 1;
-      while(table_quelconque[i].longueur != table_quelconque[i+1].longueur) {
-        if(table_quelconque[i].c < min)
-          min = table_quelconque[i].c;
-        i++;
+    for(int j = a; j<=b; j++) { // Recherche des max successivement du sous tableau pour trié en ordre decroissant
+      max = a;
+      for(int k = a; k<=b; k++) {
+        if(table_quelconque[k].c != -1 && table_quelconque[k].c > table_quelconque[max].c)
+          max = k;
       }
-      table_canonique[b].c = min;
-      table_canonique[b].longueur = table_quelconque[a].longueur; // Longueur des elements du sous tableau en traitement
-      b--;
-      j++;
+
+      printf("%d\n", max);
+      table_canonique[j].c = table_quelconque[max].c;
+      table_canonique[j].longueur = table_quelconque[max].longueur;
+      table_quelconque[max].c = -1; // traité
     }
-    a = b+1;
+    // Initialisation des borne du prochain sous tableau
+    a = b + 1;
+    b = b + 1;
   }
 
   return table_canonique;
@@ -234,25 +233,27 @@ void test_conversion_tableau_liste() {
   occ['e'] = 1;
   pnoeud_t racine = creer_arbre_quelconque(occ);
   afficher_arbre(racine, 0);
-  pcodage_t tableau = arbre_to_table(racine, 5);
+  //pcodage_t tableau = arbre_to_table(racine, 5);
 
   pcodage_t test = malloc(sizeof(codage_t)*6);
   codage_t p1; p1.c = 'a'; p1.longueur = 2; p1.code[0] = 1;
   codage_t p2; p2.c = 'b'; p2.longueur = 2; p2.code[0] = 2;
   codage_t p3; p3.c = 'c'; p3.longueur = 2; p3.code[0] = 3;
-  codage_t p4; p4.c = 'd'; p4.longueur = 3; p4.code[0] = 4;
-  codage_t p5; p5.c = 'e'; p5.longueur = 3; p5.code[0] = 5;
-  codage_t p6; p6.c = 'f'; p6.longueur = 4; p6.code[0] = 6;
-  test[0] = p1;
-  test[1] = p1;
-  test[2] = p1;
-  test[3] = p1;
-  test[4] = p1;
+  codage_t p4; p4.c = 'd'; p4.longueur = 2; p4.code[0] = 4;
+  codage_t p5; p5.c = 'e'; p5.longueur = 2; p5.code[0] = 5;
+  codage_t p6; p6.c = 'f'; p6.longueur = 2; p6.code[0] = 6;
+  test[0] = p6;
+  test[1] = p3;
+  test[2] = p2;
+  test[3] = p4;
+  test[4] = p5;
   test[5] = p1;
-  table_quelconque_to_canonique(test, 6);
 
-  for (int i = 0; i < 5; i++) {
-    printf("char: %c  -->  code: %ld \n", tableau[i].c, tableau[i].code[0]);
+  pcodage_canonique_t trie ;
+  trie = table_quelconque_to_canonique(test, 6);
+
+  for (int i = 0; i < 6; i++) {
+    printf("char: %c  -->  code: %ld \n", trie[i].c, trie[i].longueur);
   }
 }
 
