@@ -57,7 +57,8 @@ void tri_tableau(pcodage_t table,int taille);
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
-
+int estFeuille(pnoeud_t noeud);
+int profondeur(pnoeud_t noeud);
 pnoeud_t creer_arbre_quelconque(uint64_t *occurence);
 pnoeud_t convertion_canonique(uint64_t *occurence);
 

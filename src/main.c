@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
@@ -97,6 +99,18 @@ void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
+
+int estFeuille(pnoeud_t noeud) {
+  return (noeud->fgauche == NULL && noeud->fdroit == NULL);
+}
+
+int profondeur(pnoeud_t noeud) {
+  if (noeud == NULL) {
+    return 0;
+  } else {
+    return max(profondeur(noeud->fgauche), profondeur(noeud->fdroit)) + 1;
+  }
+}
 /**
  * \brief    Retourne un arbre de huffman a partir d'un tableau des occurences
  * des caractères
@@ -113,8 +127,24 @@ pnoeud_t creer_arbre_quelconque(uint64_t *occurence) {
     pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
     if (noeud1 != NULL && noeud2 != NULL) {
       pnoeud_t parent = creer_noeud(noeud1->poids + noeud2->poids);
-      parent->fgauche = noeud1;
-      parent->fdroit = noeud2;
+      if (estFeuille(noeud1) && estFeuille(noeud2)) {
+        parent->fgauche = noeud2;
+        parent->fdroit = noeud1;
+      } else if (estFeuille(noeud1) && !estFeuille(noeud2)) {
+        parent->fgauche = noeud2;
+        parent->fdroit = noeud1;
+      } else if (estFeuille(noeud2) && !estFeuille(noeud1)) {
+        parent->fgauche = noeud1;
+        parent->fdroit = noeud2;
+      } else {
+        if (profondeur(noeud1) > profondeur(noeud2)) {
+          parent->fgauche = noeud1;
+          parent->fdroit = noeud2;
+        } else {
+          parent->fgauche = noeud2;
+          parent->fdroit = noeud1;
+        }
+      }
       noeud1->parent = parent;
       noeud2->parent = parent;
       ajouter_queue(parent, liste);
@@ -273,9 +303,10 @@ void afficher_arbre(pnoeud_t a, int niveau) {
 void test_conversion_tableau_liste() {
   uint64_t *occ = malloc(sizeof(uint64_t) * 256);
   uint64_t occurence = 1;
+
   for (int i = 33; i <= 126; i++) {
     occ[i] = occurence;
-    occurence += 20;
+    occurence += 20 * i;
   }
   pnoeud_t racine = creer_arbre_quelconque(occ);
   afficher_arbre(racine, 0);
@@ -314,7 +345,7 @@ void test_conversion_tableau_liste() {
   // test[5] = p1;
   // table_quelconque_to_canonique(test, 6);
   tri_tableau(tableau, 94);
-  for (int i = 0; i <= 93; i++) {
+  for (int i = 0; i < 95; i++) {
     printf("char: %c  -->  code: %lu|%lu|%lu|%lu longueur: %d \n", tableau[i].c,
            tableau[i].code[0], tableau[i].code[1], tableau[i].code[2],
            tableau[i].code[3], tableau[i].longueur);
