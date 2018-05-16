@@ -22,7 +22,7 @@ void codage(char const* file_name) {
 
   char* new_file_name = "../tests_fonctions/codage_mtf";
   FILE* new_f = fopen(new_file_name, "w");
-  char c;
+  int c;
   int i;
   while ((c = fgetc(f)) != EOF) {
     for (i = 0; i < NB_SYMBOLES && tab[i] != c; i++);
@@ -48,7 +48,7 @@ void decodage(char const* coded_file_name) {
 
   char* new_file_name = "../tests_fonctions/decodage_mtf";
   FILE* new_f = fopen(new_file_name, "w");
-  char c;
+  int c;
   int i;
   while ((c = fgetc(f)) != EOF) {
     for (i = 0; i < NB_SYMBOLES && i != c; i++);
