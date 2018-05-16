@@ -10,44 +10,65 @@ typedef struct {
   uint256_t code;
   uint8_t longueur;
 } codage_t , *pcodage_t;
- 
+
 typedef struct {
   char c;
   uint8_t longueur;
 } codage_canonique_t , *pcodage_canonique_t;
 
-int ecrire_fichier_compresse(pcodage_t codage, const char* file_name){
+void ecrire_buffer(FILE* f, uint64_t* buffer){
+  fprintf(f, "%ld", *buffer);
+  *buffer = 0;
+}
+
+int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_name){
   //Lit le fichier initial et compresse dans un autre fichier grâce à la table des longueurs.
-  FILE* f = fopen(file_name, "r");
-  if (!f) {
+  FILE* fr = fopen(file_name, "r");
+  if (!fr) {
     printf("Ouverture du fichier impossible. Abandon.\n");
     exit(0);
   }
-  
-  char* table = malloc(/*nbr elements ds fichier  */256 * sizeof(char));
-  uint256_t * t = malloc(sizeof(uint256_t)* 256 /*nbr elements*/);
 
-  for (int i = 0; i < 256; i++) {
-    table[i] = 0;
+  char* comp_name = malloc(strlen(file_name) + 4);
+  strcpy(comp_name,file_name);
+  strcat(comp_name,".xxx")
+  FILE* fw = fopen(comp_name, "w");
+  fprintf(fw,"%d",nb_codage);
+  for (int i = 0; i < nb_codage; i++) {
+    fprintf(fw, "%c%c", codage[i].c, codage[i].longueur );
   }
 
   char c;
-  int i=0;
-  while (((c = fgetc(f)) != EOF)) {
-    table[i]=c;
-    int j=0;
-    while(table[i]!=codage[j].c){
-      j++;
+  int nb_bits_restant = 64;
+  int decalage,tab_poids_fort,nb_bits_fort;
+  codage_t code;
+  int i;
+  uint64_t buffer = 0;
+  while (((c = fgetc(fr)) != EOF)) {
+    i=0;
+    while(codage[i].c != c){
+      i++;
     }
-    if(codage[j].longueur<64){
-      t[i] = (codage[j].code[0]<<64-codage[j].longueur)>>64-codage[j].longueur;
+    code = codage[i];
+    if(code.longueur <= nb_bits_restant){
+      buffer = (code.code[0]<<nb_bits_restant-code.longueur) | buffer;
+      nb_bits_restant -= code.longueur;
+      if(nb_bits_restant == 0){
+        ecrire_buffer(fw,&buffer);
+      }
     }
-    else if(codage[j].longueur<64){
-      t[i] = (codage[j].code[0]<<64-(codage[j].longueur -64))>>64-(codage[j].longueur -64)
+    else{
+      tab_poids_fort = code.longueur / 64;
+      nb_bits_fort = code.longueur % 64;
+      decalage = nb_bits_fort - nb_bits_restant;
+      if (decalage > 0) {
+        
+      }
     }
-    i++;
+
   }
-  fclose(f);
+  fclose(fr);
+  fclose(fw);
 
 /* pour écriture: FILE *fp;
   fp = fopen( "compressed_file.txt" , "w" );
