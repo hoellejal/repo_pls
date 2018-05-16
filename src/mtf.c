@@ -4,15 +4,14 @@
 #include <string.h>
 #include "mtf.h"
 
-void creation_tab_mtf(tab_mtf* table) {
+void creation_tab_mtf(tab_mtf table) {
   for (int i = 0; i < NB_SYMBOLES; i++) {
-    table[i]->symbole = i;
-    table[i]->valeur = i;
+    table[i] = i;
   }
 }
 
-void modif_fichier(char const* file_name) {
-  tab_mtf* tab = malloc(NB_SYMBOLES*sizeof(code_lettre));
+void codage(char const* file_name) {
+  tab_mtf tab;
   creation_tab_mtf(tab);
 
   FILE* f = fopen(file_name, "r");
@@ -21,17 +20,52 @@ void modif_fichier(char const* file_name) {
     exit(0);
   }
 
-  char* new_file_name = "codage_mtf";
+  char* new_file_name = "../tests_fonctions/codage_mtf";
   FILE* new_f = fopen(new_file_name, "w");
   char c;
+  int i;
   while ((c = fgetc(f)) != EOF) {
-    for (int i = 0; i < NB_SYMBOLES && tab[i]->symbole != c; i++)
-    fputc(tab[i]->valeur, new_f);
+    for (i = 0; i < NB_SYMBOLES && tab[i] != c; i++);
+    fputc(i, new_f);
+    for (int j = i; j > 0; j--) {
+      tab[j] = tab[j-1];
+    }
+    tab[0] = c;
   }
+  fclose(f);
+  fclose(new_f);
+}
+
+void decodage(char const* coded_file_name) {
+  tab_mtf tab;
+  creation_tab_mtf(tab);
+
+  FILE* f = fopen(coded_file_name, "r");
+  if (!f) {
+    printf("Ouverture du fichier impossible. Abandon.\n");
+    exit(0);
+  }
+
+  char* new_file_name = "../tests_fonctions/decodage_mtf";
+  FILE* new_f = fopen(new_file_name, "w");
+  char c;
+  int i;
+  while ((c = fgetc(f)) != EOF) {
+    for (i = 0; i < NB_SYMBOLES && i != c; i++);
+    c = tab[i];
+    fputc(tab[i], new_f);
+    for (int j = i; j > 0; j--) {
+      tab[j] = tab[j-1];
+    }
+    tab[0] = c;
+  }
+  fclose(f);
+  fclose(new_f);
 }
 
 int main(int argc, char const *argv[]) {
-  modif_fichier(argv[1]);
+  codage(argv[1]);
+  decodage("../tests_fonctions/codage_mtf");
 
   return 0;
 }
