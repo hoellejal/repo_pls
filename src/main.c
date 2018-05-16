@@ -64,13 +64,16 @@ pnoeud_t get_noeud_min(pliste_t liste) {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
-
+/**
+ * \brief    Initialise une liste chainée des noeuds correspondant aux caractères présents dans le fichier à compresser
+ * \param    occurence    Tableau des occurrences des caractère ASCII
+ * \param    liste        Structure représentatn la liste (tête et queue)
+ */
 void conversion_tableau_liste(int *occurence, pliste_t liste) {
   int i = 0;
   while (occurence[i] == 0) {
     i++;
   }
-
 
   pnoeud_t noeud = creer_noeud(occurence[i]);
   noeud->c = i;
@@ -92,7 +95,11 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
 ////////////////////////////////
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
-
+/**
+ * \brief    Retourne un arbre de huffman a partir d'un tableau des occurences des caractères
+ * \param    occurence    Tableeau des occurrences des caractère ASCII
+ * \return   Noeud racine de l'arbre de huffman
+ */
 pnoeud_t creer_arbre_quelconque(int *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
@@ -109,10 +116,7 @@ pnoeud_t creer_arbre_quelconque(int *occurence) {
       noeud2->parent = parent;
       ajouter_queue(parent, liste);
     }
-
     afficher_liste_noeud(liste);
-    //printf("Tete : %i \n", liste->tete->poids);
-    //printf("Queue : %i \n", liste->queue->poids);
   }
   return liste->tete;
 }
@@ -173,22 +177,21 @@ pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, in
   int max;
 
   while(b < longueur_table) {
-    while(table_quelconque[b].longueur == table_quelconque[b+1].longueur) // borne supérieur du sous tableau
+    while(table_quelconque[b].longueur == table_quelconque[b+1].longueur) // borne sup du sous tableau
       b++;
 
-    for(int j = a; j<=b; j++) { // Recherche des max successivement du sous tableau pour trié en ordre decroissant
+    for(int j = a; j<=b; j++) { // Recherche des max successivement du sous tableau pour trier en ordre decroissant
       max = a;
       for(int k = a; k<=b; k++) {
         if(table_quelconque[k].c != -1 && table_quelconque[k].c > table_quelconque[max].c)
           max = k;
       }
 
-      printf("%d\n", max);
       table_canonique[j].c = table_quelconque[max].c;
       table_canonique[j].longueur = table_quelconque[max].longueur;
       table_quelconque[max].c = -1; // traité
     }
-    // Initialisation des borne du prochain sous tableau
+    // Initialisation des bornes du prochain sous tableau
     a = b + 1;
     b = b + 1;
   }
@@ -197,7 +200,7 @@ pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque, in
 }
 
 ////////////////////////////////
-/* FONCTION TEST */
+/* FONCTIONS TESTS */
 ////////////////////////////////
 
 void afficher_liste_noeud(pliste_t liste) {
@@ -236,12 +239,12 @@ void test_conversion_tableau_liste() {
   //pcodage_t tableau = arbre_to_table(racine, 5);
 
   pcodage_t test = malloc(sizeof(codage_t)*6);
-  codage_t p1; p1.c = 'a'; p1.longueur = 2; p1.code[0] = 1;
+  codage_t p1; p1.c = 'a'; p1.longueur = 1; p1.code[0] = 1;
   codage_t p2; p2.c = 'b'; p2.longueur = 2; p2.code[0] = 2;
   codage_t p3; p3.c = 'c'; p3.longueur = 2; p3.code[0] = 3;
   codage_t p4; p4.c = 'd'; p4.longueur = 2; p4.code[0] = 4;
   codage_t p5; p5.c = 'e'; p5.longueur = 2; p5.code[0] = 5;
-  codage_t p6; p6.c = 'f'; p6.longueur = 2; p6.code[0] = 6;
+  codage_t p6; p6.c = 'f'; p6.longueur = 6; p6.code[0] = 6;
   test[0] = p6;
   test[1] = p3;
   test[2] = p2;
