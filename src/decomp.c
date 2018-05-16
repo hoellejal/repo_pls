@@ -3,27 +3,41 @@
 #include <stdint.h>
 #include <string.h>
 
-typedef struct table{
+typedef struct{
   char carac;
-  short length;
-};
+  uint8_t length;
+}table_long, *ptable_long;
 
-int* lire_fichier(char const* file_name){
+ptable_long lire_fichier(const char* file_name){
   FILE* f = fopen(file_name, "r");
   if (!f) {
     printf("Ouverture du fichier impossible. Abandon.\n");
     exit(0);
   }
-  int* table = malloc(256 * sizeof(int));
-  for (int i = 0; i < 256; i++) {
-    table[i] = 0;
-  }
   
+  int c;
+  c=(fgetc(f))-'0';
+  if (c==EOF){
+    printf("Fichier vide. Abandon.\n");
+    exit(0);
+  }
+
+  ptable_long t=malloc(c*sizeof(table_long)); // a faire quelque part, soit dans la fonction soit en dehors
+
+  for(int h=0; h<c; h++){
+      fscanf(f, "%c %hhi", &t[h].carac, &t[h].length);
+  }
+
+  int* table = malloc(256 * sizeof(int));
+
   fclose(f);
 
-  return table;
+  return t;
 }
 
-int main(){
-  return 0;
+int main(int argc, char const *argv[]){
+  ptable_long y=lire_fichier(argv[1]);
+  for(int i=0;i<5;i++){
+    printf("%c %hhi \n", y[i].carac, y[i].length);
+  }
 }
