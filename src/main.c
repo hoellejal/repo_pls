@@ -66,11 +66,12 @@ pnoeud_t get_noeud_min(pliste_t liste) {
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
 /**
- * \brief    Initialise une liste chainée des noeuds correspondant aux caractères présents dans le fichier à compresser
+ * \brief    Initialise une liste chainée des noeuds correspondant aux
+ * caractères présents dans le fichier à compresser
  * \param    occurence    Tableau des occurrences des caractère ASCII
  * \param    liste        Structure représentatn la liste (tête et queue)
  */
-void conversion_tableau_liste(int *occurence, pliste_t liste) {
+void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
   int i = 0;
   while (occurence[i] == 0) {
     i++;
@@ -97,11 +98,12 @@ void conversion_tableau_liste(int *occurence, pliste_t liste) {
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
 /**
- * \brief    Retourne un arbre de huffman a partir d'un tableau des occurences des caractères
+ * \brief    Retourne un arbre de huffman a partir d'un tableau des occurences
+ * des caractères
  * \param    occurence    Tableeau des occurrences des caractère ASCII
  * \return   Noeud racine de l'arbre de huffman
  */
-pnoeud_t creer_arbre_quelconque(int *occurence) {
+pnoeud_t creer_arbre_quelconque(uint64_t *occurence) {
   pliste_t liste = malloc(sizeof(liste_t));
   conversion_tableau_liste(occurence, liste);
   afficher_liste_noeud(liste);
@@ -193,7 +195,6 @@ void tri_tableau(pcodage_t table, int taille) {
 // Creation fonction table quelquonque to canonique
 // Affichage des caractère pour les noeuds feuilles
 
-
 /**
  * \brief    Retourne une table de huffman canonique à partir d'une table
  * quelconque
@@ -215,14 +216,17 @@ pcodage_canonique_t table_quelconque_to_canonique(pcodage_t table_quelconque,
   int a = 0, b = 0;
   int max;
 
-  while(b < longueur_table) {
-    while(table_quelconque[b].longueur == table_quelconque[b+1].longueur) // borne sup du sous tableau
+  while (b < longueur_table) {
+    while (table_quelconque[b].longueur ==
+           table_quelconque[b + 1].longueur) // borne sup du sous tableau
       b++;
 
-    for(int j = a; j<=b; j++) { // Recherche des max successivement du sous tableau pour trier en ordre decroissant
+    for (int j = a; j <= b; j++) { // Recherche des max successivement du sous
+                                   // tableau pour trier en ordre decroissant
       max = a;
-      for(int k = a; k<=b; k++) {
-        if(table_quelconque[k].c != -1 && table_quelconque[k].c > table_quelconque[max].c)
+      for (int k = a; k <= b; k++) {
+        if (table_quelconque[k].c != -1 &&
+            table_quelconque[k].c > table_quelconque[max].c)
           max = k;
       }
 
