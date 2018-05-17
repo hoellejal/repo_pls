@@ -14,7 +14,7 @@ ptable_long lire_table_longueur(const char* file_name){
     printf("Ouverture du fichier impossible. Abandon.\n");
     exit(0);
   }
-  
+
   int c;
   c=(fgetc(f))-'0';
   if (c==EOF){
@@ -34,6 +34,11 @@ ptable_long lire_table_longueur(const char* file_name){
 
   return t;
 }
+
+void table_canonique_to_arbre(pcodage_t table, int nb_caractere) {
+  
+}
+
 
 int main(int argc, char const *argv[]){
   ptable_long y=lire_fichier(argv[1]);

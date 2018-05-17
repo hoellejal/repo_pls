@@ -1,6 +1,7 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 #include <stdint.h>
+#include <stdio.h>
 #include "noeud.h"
 
 typedef uint64_t uint256_t[4];
@@ -23,6 +24,11 @@ typedef struct {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
+int* table_pourcentage_huffman(char const* file_name);
+
+void ecrire_buffer(FILE* f, uint64_t* buffer);
+
+int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_name);
 void conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
 
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);

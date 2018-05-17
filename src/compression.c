@@ -4,6 +4,35 @@
 #include <stdlib.h>
 #include <string.h>
 
+int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
+  FILE* f = fopen(file_name, "r");
+  if (!f) {
+    printf("Ouverture du fichier impossible. Abandon.\n");
+    exit(0);
+  }
+  int* table = malloc(256 * sizeof(int));
+  for (int i = 0; i < 256; i++) {
+    table[i] = 0;
+  }
+  int c;
+  while ((c = fgetc(f)) != EOF) {
+    table[c]++;
+  }
+  table[EOF]++;
+  fclose(f);
+
+  return table;
+}
+
+
+void ecrire_buffer(FILE* f, uint64_t* buffer){
+ fprintf(f, "%ld", *buffer);
+ *buffer = 0;
+}
+
+
+
+
 
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
@@ -14,16 +43,19 @@
  * \param    occurence    Tableau des occurrences des caractère ASCII
  * \param    liste        Structure représentatn la liste (tête et queue)
  */
-void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
+int conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
   int i = 0;
+
   while (occurence[i] == 0) {
     i++;
   }
 
+  int nb_carac = 1;
   pnoeud_t noeud = creer_noeud(occurence[i]);
   noeud->c = i;
   liste->tete = noeud;
   i++;
+
 
   pnoeud_t noeud_crt = liste->tete;
   for (; i < 256; i++) {
@@ -32,9 +64,11 @@ void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
       noeud->c = i;
       noeud_crt->suiv = noeud;
       noeud_crt = noeud;
+      nb_carac++;
     }
   }
   liste->queue = noeud_crt;
+  return
 }
 
 ////////////////////////////////
@@ -189,7 +223,6 @@ void tri_tableau(pcodage_t table, int taille) {
 void table_quelconque_to_canonique(pcodage_t table, int taille) {
 
   int a = 0, b = 0;
-  int max;
 
   while (b < taille) {
     while (b < taille && table[b].longueur == table[b + 1].longueur) // borne sup du sous tableau

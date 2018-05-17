@@ -1,6 +1,8 @@
 #ifndef NOEUD_H
 #define NOEUD_H
 
+#include <stdint.h>
+
 typedef struct n {
     struct n *parent;
     struct n *fgauche;
