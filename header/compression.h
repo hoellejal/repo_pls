@@ -8,8 +8,6 @@
 
 typedef uint64_t uint256_t[4];
 
-
-
 typedef struct {
   char c;
   uint256_t code;
@@ -21,9 +19,19 @@ typedef struct {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
-uint64_t* table_pourcentage_huffman(char const* file_name);
+void affiche_table_de_codage(pcodage_t codage,int taille);
+
+void ecrire_buffer(FILE* f, uint64_t* buffer);
+
+int ecrire_fichier_compresse(pcodage_t codage, int nb_codage,char* file_name);
+
+uint64_t* table_pourcentage_huffman(char *file_name);
 
 void compression(char* path);
+void get_precedent(pnoeud_t noeud_arriver,pliste_t liste);
+void tri_arbre_largeur(pnoeud_t head);
+
+void tri_tableau(pcodage_t table,int taille);
 
 int conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
 
@@ -36,8 +44,6 @@ void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint6
 void decalage_256_multiple(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3,uint64_t decalage);
 
 void incremente(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
-
-void tri_tableau(pcodage_t table,int taille);
 
 void table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table);
 

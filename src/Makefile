@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = compression.o noeud.o
+OBJS = compression.o noeud.o decompression.o
 TEST = ../test/test_compression.o
 CFLAGS = -Wall
 CPPFLAGS = -I$(HEADER)

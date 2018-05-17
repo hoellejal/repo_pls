@@ -27,7 +27,7 @@ void afficher_liste_noeud(pliste_t liste) {
     return;
   pnoeud_t n = liste->tete;
   while (n != NULL) {
-    printf("%lu | ", n->poids);
+    printf("%u->%lu | ",n->c, n->poids);
     n = n->suiv;
   }
   printf("\n");
@@ -37,6 +37,9 @@ void afficher_liste_noeud(pliste_t liste) {
 pnoeud_t creer_noeud(uint64_t poids) {
   pnoeud_t noeud = malloc(sizeof(noeud_t));
   noeud->poids = poids;
+  noeud->fgauche = NULL;
+  noeud->fdroit = NULL;
+  noeud->parent = NULL;
   return noeud;
 }
 
@@ -77,7 +80,7 @@ pnoeud_t get_noeud_min(pliste_t liste) {
     pnoeud_t noeud_min = noeud_courant;
     noeud_courant = noeud_courant->suiv;
     while (noeud_courant != NULL) {
-      if (noeud_min->poids > noeud_courant->poids) {
+      if (noeud_min->poids > noeud_courant->poids || ( noeud_min->poids == noeud_courant->poids  &&  profondeur(noeud_min) < profondeur(noeud_courant) ) ) {
         noeud_min = noeud_courant;
       }
       noeud_courant = noeud_courant->suiv;

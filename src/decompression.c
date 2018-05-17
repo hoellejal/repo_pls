@@ -26,7 +26,7 @@ pcodage_t lire_entete(FILE *file,int *taille){
   if ( (c=fgetc(file)) != EOF){
     *taille=c;
       pcodage_t table = malloc(*taille*sizeof(codage_t)); // a faire quelque part, soit dans la fonction soit en dehors
-      int i=c;
+      int i=0;
       while (i<*taille) {
           fscanf(file, "%c%c", &table[i].c, &table[i].longueur);
           i++;
@@ -39,18 +39,17 @@ pcodage_t lire_entete(FILE *file,int *taille){
 }
 
 void set_table_decompression(pcodage_t codage,int taille){
-  int ancienne_longueur=1;
+  int ancienne_longueur=codage[0].longueur;
   int i=0;
   int longueur_courante=codage[0].longueur;
   uint64_t code0=0;
   uint64_t code1=0;
   uint64_t code2=0;
   uint64_t code3=0;
-
   while(i < taille) {
     longueur_courante=codage[i].longueur;
-    decalage_256_multiple(&code0,&code1,&code2,&code3,longueur_courante-ancienne_longueur);
 
+    decalage_256_multiple(&code0,&code1,&code2,&code3,longueur_courante-ancienne_longueur);
     while (i<taille && longueur_courante == codage[i].longueur) {
       codage[i].code[0]=code0;
       codage[i].code[1]=code1;
@@ -59,5 +58,6 @@ void set_table_decompression(pcodage_t codage,int taille){
       incremente(&code0,&code1,&code2,&code3);
       i++;
     }
+    ancienne_longueur=longueur_courante;
   }
 }

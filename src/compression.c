@@ -1,5 +1,62 @@
 #include "compression.h"
+#include "decompression.h"
 
+
+
+void tri_arbre_largeur(pnoeud_t head){
+  pliste_t liste = malloc(sizeof(pliste_t));
+
+  ajouter_queue(head,liste);
+
+  while (liste->queue != NULL) {
+    if(liste->tete != liste->queue){
+      pnoeud_t noeud_courant;
+      pnoeud_t noeud_suivant;
+      pnoeud_t noeud_arriver = liste->queue;
+      while (noeud_arriver != liste->tete) {
+        noeud_courant = liste->tete;
+        noeud_suivant = noeud_courant->suiv;
+        while (noeud_suivant <= noeud_arriver) {
+          if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
+            pnoeud_t tampon = noeud_suivant->parent;
+            noeud_suivant->parent = noeud_courant;
+            noeud_courant->parent = tampon;
+          }
+          noeud_courant = noeud_suivant;
+          noeud_suivant = noeud_suivant->suiv;
+        }
+        noeud_arriver=get_precedent(noeud_arriver,liste);
+      }
+
+      pnoeud_t ancien_queue = liste->queue;
+
+      while (liste->tete<=ancien_queue) {
+        if (liste->tete->fgauche != NULL){
+          ajouter_queue(liste->tete->fgauche,liste);
+        }
+        if (liste->tete->fdroit != NULL){
+          ajouter_queue(liste->tete->fdroit,liste);
+        }
+        retirer_noeud(liste->tete,liste);
+      }
+    }
+  }
+}
+
+void get_precedent(noeud_arriver,liste){
+  pnoeud_t head = liste->tete;
+  while (head->suiv != noeud_arriver){
+    head = head->suiv;
+  }
+  return head;
+}
+
+void affiche_table_de_codage(pcodage_t codage,int taille){
+  for (int i = 0; i < taille; i++) {
+    printf("char: %d;longueur: %d;code: %lu|%lu|%lu|%lu\n", codage[i].c,codage[i].longueur,codage[i].code[3],codage[i].code[2],codage[i].code[1],codage[i].code[0]);
+  }
+
+}
 
 void compression(char* path){
   uint64_t *occurence = table_pourcentage_huffman(path);
@@ -9,7 +66,19 @@ void compression(char* path){
   afficher_arbre(racine, 0);
   pcodage_t tableau = arbre_to_table(racine, nb_char);
   table_quelconque_to_canonique(tableau, nb_char);
-
+  affiche_table_de_codage(tableau,nb_char);
+  ecrire_fichier_compresse(tableau,nb_char,path);
+printf("-----------------------------------------------------\n" );
+  FILE* compress = fopen("../test/test.txt.ggg", "r");
+  if (!compress) {
+    printf("Ouverture du fichier impossible. Abandon.\n");
+    exit(0);
+  }
+  int nb;
+  pcodage_t nouveau_codage = lire_entete(compress,&nb);
+  set_table_decompression(nouveau_codage,nb);
+  affiche_table_de_codage(nouveau_codage,nb);
+  fclose(compress);
 
 }
 
@@ -23,12 +92,14 @@ void compression(char* path){
  * \param    liste        Structure représentatn la liste (tête et queue)
  */
 
-uint64_t* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
-  FILE* f = fopen(file_name, "r");
+uint64_t* table_pourcentage_huffman(char * path){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
+
+  FILE* f = fopen(path, "r");
   if (!f) {
     printf("Ouverture du fichier impossible. Abandon.\n");
     exit(0);
   }
+
   uint64_t* table = malloc(256 * sizeof(uint64_t));
   for (int i = 0; i < 256; i++) {
     table[i] = 0;
@@ -39,7 +110,6 @@ uint64_t* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du f
   }
   table[255]=1;
   fclose(f);
-
   return table;
 }
 
@@ -88,23 +158,16 @@ pnoeud_t creer_arbre_quelconque(pliste_t liste) {
     pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
     if (noeud1 != NULL && noeud2 != NULL) {
       pnoeud_t parent = creer_noeud(noeud1->poids + noeud2->poids);
-      printf("noeud1 --> %d \n",noeud1->c);
-      printf("noeud2 --> %d \n",noeud2->c);
-      printf("parent --> %d \n",parent->c);
       if (estFeuille(noeud1) && estFeuille(noeud2)) {
-        printf("salem\n");
         parent->fgauche = noeud2;
         parent->fdroit = noeud1;
       } else if (estFeuille(noeud1) && !estFeuille(noeud2)) {
-        printf("salem\n");
         parent->fgauche = noeud2;
         parent->fdroit = noeud1;
       } else if (estFeuille(noeud2) && !estFeuille(noeud1)) {
-        printf("salem\n");
         parent->fgauche = noeud1;
         parent->fdroit = noeud2;
       } else {
-        printf("salem\n");
         if (profondeur(noeud1) > profondeur(noeud2)) {
           parent->fgauche = noeud1;
           parent->fdroit = noeud2;
@@ -276,4 +339,104 @@ void table_quelconque_to_canonique(pcodage_t table, int taille) {
     a = b + 1;
     b = b + 1;
   }
+}
+
+
+void ecrire_buffer(FILE* f, uint64_t* buffer){
+  char* tmp = (char*)buffer;
+  for (int i = 7; i >= 0; i--) {
+    fprintf(f, "%c", tmp[i]);
+  }
+  *buffer = 0;
+}
+
+int ecrire_fichier_compresse(pcodage_t codage, int nb_codage,char* file_name){
+
+    FILE* fr = fopen(file_name, "r");
+    if (!fr) {
+      printf("Ouverture du fichier impossible. Abandon.\n");
+      exit(0);
+    }
+
+  char* comp_name = malloc(strlen(file_name) + 4);
+  strcpy(comp_name,file_name);
+  strcat(comp_name,".ggg");
+  FILE* fw = fopen(comp_name, "w");
+  fprintf(fw,"%c",nb_codage);
+  for (int i = 0; i < nb_codage; i++) {
+    fprintf(fw, "%c%c", codage[i].c, codage[i].longueur );
+  }
+  uint8_t c;
+  int nb_bits_restant = 64;
+  int decalage,tab_poids_fort,nb_bits_fort;
+  codage_t code;
+  int i;
+  uint64_t buffer = 0;
+  uint64_t save,mask;
+  while ((c = fgetc(fr)) != (uint8_t)EOF) {
+    i=0;
+    while(codage[i].c != c){
+      i++;
+    }
+    code = codage[i];
+    if(code.longueur <= nb_bits_restant){
+      buffer = (code.code[0]<< (nb_bits_restant-code.longueur )) | buffer;
+      nb_bits_restant -= code.longueur;
+      if(nb_bits_restant == 0){
+        ecrire_buffer(fw,&buffer);
+      }
+    }
+    else{
+      tab_poids_fort = code.longueur / 64;
+      nb_bits_fort = code.longueur % 64;
+      decalage = nb_bits_fort - nb_bits_restant;
+      mask = ((1 << decalage) - 1);
+      if (decalage > 0) {
+        save = code.code[0] & mask;
+        for (int i = 0; i < tab_poids_fort; i++) {
+          code.code[i] >>= decalage;
+          if (i+1 != tab_poids_fort) {
+            code.code[i] |= (code.code[i+1] & mask) << (64 - decalage);
+          }
+        }
+        buffer |= code.code[tab_poids_fort] >> decalage;
+        ecrire_buffer(fw,&buffer);
+        for(int i = tab_poids_fort - 1; i >= 0; i++){
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        buffer = save << (64 - decalage);
+        nb_bits_restant = 64 - decalage;
+      }
+      else if (decalage == 0) {
+        buffer |= code.code[tab_poids_fort] & ((1 << nb_bits_restant) - 1);
+        ecrire_buffer(fw,&buffer);
+        for(int i = tab_poids_fort - 1; i >= 0; i++){
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        nb_bits_restant = 64;
+      }
+      else {
+        decalage = -decalage;
+        code.code[tab_poids_fort] <<= decalage;
+        code.code[tab_poids_fort] |= (code.code[tab_poids_fort-1] >> (64 - decalage));
+        buffer |= code.code[tab_poids_fort];
+        ecrire_buffer(fw,&code.code[tab_poids_fort]);
+        for (int i = tab_poids_fort - 1; i > 0; i--) {
+          code.code[i] <<= decalage;
+          code.code[i] |= (code.code[i-1] >> (64 - decalage));
+          buffer |= code.code[i];
+          ecrire_buffer(fw,&code.code[i]);
+        }
+        code.code[0] <<= decalage;
+        buffer |= code.code[0];
+        nb_bits_restant = decalage;
+      }
+    }
+  }
+  if (nb_bits_restant != 64) {
+    ecrire_buffer(fw,&buffer);
+  }
+  fclose(fw);
+  fclose(fr);
+  return 1;
 }
