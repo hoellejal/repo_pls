@@ -2,33 +2,40 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "decompression.h"
+#include "compression.h"
 
 
-ptable_long lire_table_longueur(const char* file_name){
-  FILE* f = fopen(file_name, "r");
-  if (!f) {
-    printf("Ouverture du fichier impossible. Abandon.\n");
-    exit(0);
+int decompression(char* path){
+  FILE *file = fopen(path,'r');
+
+  if(file == NULL){
+    printf("Le fichier %s est inconnnue \n",path );
+    return 0;
+  }
+  int taille;
+  pcodage_t code = lire_entete(file,&taille);
+  set_table_decompression(code,taille);
+  for (int i = 0; i < taille; i++) {
+    printf("char %c --> %lu|%lu|%lu|%lu\n", table[i].c,table[i].code[3],table[i].code[2],table[i].code[1],table[i].code[0]);
   }
 
+
+}
+
+pcodage_t lire_entete(File *file,int *taille){
   int c;
-  c=(fgetc(f))-'0';
-  if (c==EOF){
-    printf("Fichier vide. Abandon.\n");
-    exit(0);
+  if ( (c=fgetc(f)) != EOF){
+    *taille=c;
+      pcodage_t table = malloc(*taille*sizeof(codage_t)); // a faire quelque part, soit dans la fonction soit en dehors
+      int i=c;
+      while (i<*taille) {
+          fscanf(f, "%c%c", &table[i].c, &table[i].longueur);
+          i++;
+      }
   }
 
-  ptable_long t=malloc(c*sizeof(table_long)); // a faire quelque part, soit dans la fonction soit en dehors
-
-  for(int h=0; h<c; h++){
-      fscanf(f, "%c %hhi", &t[h].carac, &t[h].length);
-  }
-
-  int* table = malloc(256 * sizeof(int));
-
-  fclose(f);
-
-  return t;
+  return table;
 }
 
 void set_table_decompression(pcodage_t codage,int taille){

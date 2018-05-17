@@ -18,6 +18,8 @@ typedef struct {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
+void compression(char* path);
+
 int conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
 
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
@@ -26,9 +28,15 @@ void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0, uint6
 
 void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
 
+void decalage_256_multiple(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3,uint64_t decalage);
+
+void incremente(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
+
 void tri_tableau(pcodage_t table,int taille);
 
 void table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table);
+
+
 
 
 ////////////////////////////////

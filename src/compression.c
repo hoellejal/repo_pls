@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+void compression(char* path){
+  uint64_t *occurence[256];
+
+
+}
+
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
@@ -118,6 +125,34 @@ void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2,
   }
   *valeur0 <<= 1;
 }
+
+void decalage_256_multiple(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2,
+                  uint64_t *valeur3,uint64_t decalage) {
+  for (int i = 0; i < decalage; i++) {
+    decalage_256(valeur0,valeur1,valeur2,valeur3);
+  }
+}
+
+
+void incremente(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2,
+                  uint64_t *valeur3) {
+
+  uint64_t mask= 0;
+  if (*valeur2 == ~mask ) {
+    *valeur3 += 1;
+  }
+
+  if (*valeur1 == ~mask) {
+    *valeur2 += 1;
+  }
+
+  if (*valeur0 == ~mask) {
+    *valeur1 += 1;
+  }
+  *valeur0 +=1;
+}
+
+
 
 /**
  * \brief    Création de la table de codage à partir de l'arbre de Huffman
