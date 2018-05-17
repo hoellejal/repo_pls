@@ -194,7 +194,6 @@ void tri_tableau(pcodage_t table, int taille) {
 void table_quelconque_to_canonique(pcodage_t table, int taille) {
 
   int a = 0, b = 0;
-  int max;
 
   while (b < taille) {
     while (b < taille &&
