@@ -17,7 +17,10 @@ typedef struct {
 } codage_canonique_t , *pcodage_canonique_t;
 
 void ecrire_buffer(FILE* f, uint64_t* buffer){
-  fprintf(f, "%ld", *buffer);
+  char* tmp = (char*)buffer;
+  for (int i = 7; i >= 0; i--) {
+    fprintf(f, "%c", tmp[i]);
+  }
   *buffer = 0;
 }
 
@@ -31,21 +34,21 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
 
   char* comp_name = malloc(strlen(file_name) + 4);
   strcpy(comp_name,file_name);
-  strcat(comp_name,".xxx");
+  strcat(comp_name,".ggg");
   FILE* fw = fopen(comp_name, "w");
   fprintf(fw,"%d",nb_codage);
   for (int i = 0; i < nb_codage; i++) {
     fprintf(fw, "%c%c", codage[i].c, codage[i].longueur );
   }
-
-  char c;
+  uint8_t c;
   int nb_bits_restant = 64;
   int decalage,tab_poids_fort,nb_bits_fort;
   codage_t code;
   int i;
   uint64_t buffer = 0;
   uint64_t save,mask;
-  while (((c = fgetc(fr)) != EOF)) {
+  while ((c = fgetc(fr)) != (uint8_t)EOF) {
+    printf("%lu\n", buffer);
     i=0;
     while(codage[i].c != c){
       i++;
@@ -93,7 +96,7 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
         code.code[tab_poids_fort] |= (code.code[tab_poids_fort-1] >> (64 - decalage));
         buffer |= code.code[tab_poids_fort];
         ecrire_buffer(fw,&code.code[tab_poids_fort]);
-        for (int i = tab_poids_fort - 1; i > 0; i++) {
+        for (int i = tab_poids_fort - 1; i > 0; i--) {
           code.code[i] <<= decalage;
           code.code[i] |= (code.code[i-1] >> (64 - decalage));
           buffer |= code.code[i];
@@ -105,13 +108,12 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage, const char* file_n
       }
     }
   }
+  printf("%lu\n",buffer );
+  if (nb_bits_restant != 64) {
+    ecrire_buffer(fw,&buffer);
+  }
   fclose(fr);
   fclose(fw);
 
   return 1;
-}
-
-int main(int argc, char const *argv[]) {
-
-  return 0;
 }
