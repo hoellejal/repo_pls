@@ -13,16 +13,20 @@ void compression(char const* file_name) {
   char* new_file_name = "../test/codage_rle";
   FILE* new_f = fopen(new_file_name, "w");
   int c1 = EOF;
-  char c2 = EOF;
+  int c2 = EOF;
   uint8_t i;
+  uint8_t max = ~0;
   while ((c1 = fgetc(f)) != EOF) {
     fputc(c1, new_f);
     if (c1 == c2) {
       i = 0;
-      while ((c2 = fgetc(f)) == c1) {i++;}
+      while (((c2 = fgetc(f)) == c1) && i<max) {i++;printf("i:%d \n",i);}
       fputc(i, new_f);
-      fputc(c2, new_f);
-    } else {
+      if (c2!=EOF){
+        fputc(c2, new_f);
+      }
+    }
+    else{
       c2 = c1;
     }
   }
@@ -40,7 +44,7 @@ void decompression(char const* file_name) {
   char* new_file_name = "../test/decodage_rle";
   FILE* new_f = fopen(new_file_name, "w");
   int c1 = EOF;
-  char c2 = EOF;
+  int c2 = EOF;
   uint8_t i;
   while ((c1 = fgetc(f)) != EOF) {
     fputc(c1, new_f);
