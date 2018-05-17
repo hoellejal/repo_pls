@@ -20,7 +20,7 @@ void codage(char const* file_name) {
     exit(0);
   }
 
-  char* new_file_name = "../tests_fonctions/codage_mtf";
+  char* new_file_name = "../test/codage_mtf";
   FILE* new_f = fopen(new_file_name, "w");
   int c;
   int i;
@@ -46,7 +46,7 @@ void decodage(char const* coded_file_name) {
     exit(0);
   }
 
-  char* new_file_name = "../tests_fonctions/decodage_mtf";
+  char* new_file_name = "../test/decodage_mtf";
   FILE* new_f = fopen(new_file_name, "w");
   int c;
   int i;
@@ -65,7 +65,7 @@ void decodage(char const* coded_file_name) {
 
 int main(int argc, char const *argv[]) {
   codage(argv[1]);
-  decodage("../tests_fonctions/codage_mtf");
+  decodage("../test/codage_mtf");
 
   return 0;
 }
