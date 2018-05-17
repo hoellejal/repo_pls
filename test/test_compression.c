@@ -33,7 +33,6 @@ void afficher_arbre(pnoeud_t a, int niveau) {
 
 void test_conversion_tableau_liste() {
   uint64_t *occ = malloc(sizeof(uint64_t) * 256);
-  uint64_t occurence = 1;
 
   occ['b'] = 1;
   occ['d'] = 1;
@@ -46,38 +45,6 @@ void test_conversion_tableau_liste() {
   afficher_arbre(racine, 0);
   pcodage_t tableau = arbre_to_table(racine, 6);
 
-  pcodage_t test = malloc(sizeof(codage_t) * 6);
-/*  codage_t p1;
-  p1.c = 'b';
-  p1.longueur = 1;
-  p1.code[0] = 1;
-  codage_t p2;
-  p2.c = 'b';
-  p2.longueur = 2;
-  p2.code[0] = 2;
-  codage_t p3;
-  p3.c = 'c';
-  p3.longueur = 2;
-  p3.code[0] = 3;
-  codage_t p4;
-  p4.c = 'd';
-  p4.longueur = 3;
-  p4.code[0] = 4;
-  codage_t p5;
-  p5.c = 'e';
-  p5.longueur = 3;
-  p5.code[0] = 5;
-  codage_t p6;
-  p6.c = 'f';
-  p6.longueur = 4;
-  p6.code[0] = 6;
-  test[0] = p1;
-  test[1] = p1;
-  test[2] = p1;
-  test[3] = p1;
-  test[4] = p1;
-  test[5] = p1;*/
-  table_quelconque_to_canonique(test, 6);
   tri_tableau(tableau, 6);
   for (int i = 0; i < 6; i++) {
     printf("%d char: %c  -->  code: %lu|%lu|%lu|%lu longueur: %d \n", i, tableau[i].c,
@@ -96,8 +63,20 @@ void test_conversion_tableau_liste() {
   printf("\n\n\n");
 }
 
+test_compression_fichier(){
+  int * occurence = table_pourcentage_huffman("test.txt");
+  int taille;
+  pnoeud_t racine = creer_arbre_quelconque(occurence);
+  pcodage_t codage = arbre_to_table(racine, taille);
+  tri_tableau(codage, taille);
+  table_quelconque_to_canonique(codage, taille);
+
+}
+
+
 int main(int argc, char const *argv[]) {
-  test_conversion_tableau_liste();
+  //test_conversion_tableau_liste();
+  test_compression_fichier();
 
   return 0;
 }

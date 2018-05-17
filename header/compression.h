@@ -29,7 +29,11 @@ pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
 
 void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0, uint64_t valeur1, uint64_t valeur2, uint64_t valeur3, pcodage_t table, int profondeur);
 
-void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
+void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3,uint64_t decalage);
+
+void incremente(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
+
+set_table_decompression(pcodage_t codage,int taille);
 
 void tri_tableau(pcodage_t table,int taille);
 
