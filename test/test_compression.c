@@ -33,7 +33,6 @@ void afficher_arbre(pnoeud_t a, int niveau) {
 
 void test_conversion_tableau_liste() {
   uint64_t *occ = malloc(sizeof(uint64_t) * 256);
-  uint64_t occurence = 1;
 
   occ['b'] = 1;
   occ['d'] = 1;

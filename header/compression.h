@@ -13,11 +13,6 @@ typedef struct {
   uint8_t longueur;
 } codage_t , *pcodage_t;
 
-typedef struct {
-  char c;
-  uint8_t longueur;
-} codage_canonique_t , *pcodage_canonique_t;
-
 
 
 ////////////////////////////////
