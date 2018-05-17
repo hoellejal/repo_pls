@@ -23,7 +23,7 @@ typedef struct {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
-void conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
+int conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
 
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
 

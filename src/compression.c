@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
@@ -14,12 +13,16 @@
  * \param    occurence    Tableau des occurrences des caractère ASCII
  * \param    liste        Structure représentatn la liste (tête et queue)
  */
-void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
+int conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
   int i = 0;
-  while (occurence[i] == 0) {
+  int nombre_caractere = 1;
+  while (occurence[i] == 0 && i < 256) {
     i++;
   }
 
+  if (i == 256) {
+    return 0;
+  }
   pnoeud_t noeud = creer_noeud(occurence[i]);
   noeud->c = i;
   liste->tete = noeud;
@@ -32,9 +35,11 @@ void conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
       noeud->c = i;
       noeud_crt->suiv = noeud;
       noeud_crt = noeud;
+      nombre_caractere++;
     }
   }
   liste->queue = noeud_crt;
+  return nombre_caractere;
 }
 
 ////////////////////////////////
@@ -84,7 +89,8 @@ pnoeud_t creer_arbre_quelconque(uint64_t *occurence) {
 }
 
 /**
- * \brief    Permet d'effectuer un décalage du type uint256_t (implémenté dans compression.h)
+ * \brief    Permet d'effectuer un décalage du type uint256_t (implémenté dans
+ * compression.h)
  * \param    valeur0  64 premiers bits
  * \param    valeur1
  * \param    valeur2
@@ -112,7 +118,6 @@ void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2,
   *valeur0 <<= 1;
 }
 
-
 /**
  * \brief    Création de la table de codage à partir de l'arbre de Huffman
  * \param    racine  Racine de l'arbre de Huffman
@@ -135,7 +140,9 @@ pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere) {
  * \param    profondeur Profondeur du noeud courant
  * \return
  */
-void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0, uint64_t valeur1, uint64_t valeur2, uint64_t valeur3, pcodage_t table, int profondeur) {
+void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0,
+                           uint64_t valeur1, uint64_t valeur2, uint64_t valeur3,
+                           pcodage_t table, int profondeur) {
 
   if (racine != NULL) {
 
@@ -158,7 +165,6 @@ void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0, uint6
   }
 }
 
-
 /**
  * \brief    Tri le tableau table selon la longueur des codages
  * \param    table  Tableau à trier
@@ -177,7 +183,6 @@ void tri_tableau(pcodage_t table, int taille) {
   }
 }
 
-
 /**
  * \brief    Tri le tableau table selon les caractères
  * \details  Table doit avoir des éléments contigus selon la longueur des codage
@@ -192,19 +197,21 @@ void table_quelconque_to_canonique(pcodage_t table, int taille) {
   int max;
 
   while (b < taille) {
-    while (b < taille && table[b].longueur == table[b + 1].longueur) // borne sup du sous tableau
+    while (b < taille &&
+           table[b].longueur ==
+               table[b + 1].longueur) // borne sup du sous tableau
       b++;
 
-     for (int i = a; i <= b; i++) {
-       for (int j = a+1; j <= b - i + a; j++) {
-         if (table[j - 1].c > table[j].c) {
-           char tampon = table[j - 1].c;
-           table[j - 1].c = table[j].c;
-           table[j].c = tampon;
-         }
-       }
-     }
-     a = b + 1;
-     b = b + 1;
-   }
+    for (int i = a; i <= b; i++) {
+      for (int j = a + 1; j <= b - i + a; j++) {
+        if (table[j - 1].c > table[j].c) {
+          char tampon = table[j - 1].c;
+          table[j - 1].c = table[j].c;
+          table[j].c = tampon;
+        }
+      }
+    }
+    a = b + 1;
+    b = b + 1;
+  }
 }
