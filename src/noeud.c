@@ -9,6 +9,30 @@
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
+void afficher_arbre(pnoeud_t a, int niveau) {
+  int i;
+  if (a != NULL) {
+    afficher_arbre(a->fdroit, niveau + 1);
+
+    for (i = 0; i < niveau; i++)
+      printf("\t");
+
+    printf(" %lu %c (%d)\n\n", a->poids, a->c, niveau);
+    afficher_arbre(a->fgauche, niveau + 1);
+  }
+}
+
+void afficher_liste_noeud(pliste_t liste) {
+  if (!liste)
+    return;
+  pnoeud_t n = liste->tete;
+  while (n != NULL) {
+    printf("%lu | ", n->poids);
+    n = n->suiv;
+  }
+  printf("\n");
+}
+
 
 pnoeud_t creer_noeud(uint64_t poids) {
   pnoeud_t noeud = malloc(sizeof(noeud_t));
@@ -65,7 +89,11 @@ pnoeud_t get_noeud_min(pliste_t liste) {
 }
 
 int estFeuille(pnoeud_t noeud) {
-  return (noeud->fgauche == NULL && noeud->fdroit == NULL);
+  if (noeud != NULL){
+    return (noeud->fgauche == NULL && noeud->fdroit == NULL);
+  }else{
+    return 0;
+  }
 }
 
 int profondeur(pnoeud_t noeud) {

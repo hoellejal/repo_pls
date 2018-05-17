@@ -1,6 +1,9 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "noeud.h"
 
 typedef uint64_t uint256_t[4];
@@ -18,6 +21,8 @@ typedef struct {
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
 ////////////////////////////////
+uint64_t* table_pourcentage_huffman(char const* file_name);
+
 void compression(char* path);
 
 int conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
@@ -43,7 +48,7 @@ void table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_tabl
 /*   FONCTION CREATION ARBRE  */
 ////////////////////////////////
 
-pnoeud_t creer_arbre_quelconque(uint64_t *occurence);
+pnoeud_t creer_arbre_quelconque(pliste_t liste);
 
 ////////////////////////////////
 /* FONCTION TEST */

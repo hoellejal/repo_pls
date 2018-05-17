@@ -1,6 +1,9 @@
 #ifndef NOEUD_H
 #define NOEUD_H
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 typedef struct n {
@@ -20,6 +23,8 @@ typedef struct {
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
+void afficher_arbre(pnoeud_t a, int niveau);
+void afficher_liste_noeud(pliste_t liste);
 pnoeud_t creer_noeud(uint64_t poids);
 void ajouter_queue(pnoeud_t noeud, pliste_t liste);
 pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste);

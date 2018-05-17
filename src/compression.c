@@ -1,13 +1,14 @@
 #include "compression.h"
-#include "noeud.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 void compression(char* path){
-  uint64_t *occurence[256];
+  uint64_t *occurence = table_pourcentage_huffman(path);
+  pliste_t liste = malloc(sizeof(liste_t));
+  int nb_char = conversion_tableau_liste(occurence,liste);
+  pnoeud_t racine = creer_arbre_quelconque(liste);
+  afficher_arbre(racine, 0);
+  pcodage_t tableau = arbre_to_table(racine, nb_char);
+  table_quelconque_to_canonique(tableau, nb_char);
 
 
 }
@@ -22,24 +23,25 @@ void compression(char* path){
  * \param    liste        Structure représentatn la liste (tête et queue)
  */
 
-int* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères 
-  FILE* f = fopen(file_name, "r"); 
-  if (!f) { 
-    printf("Ouverture du fichier impossible. Abandon.\n"); 
-    exit(0); 
-  } 
-  int* table = malloc(256 * sizeof(int)); 
-  for (int i = 0; i < 256; i++) { 
-    table[i] = 0; 
-  } 
-  char c; 
-  while ((c = fgetc(f)) != EOF) { 
-    table[c]++; 
-  } 
-  fclose(f); 
- 
-  return table; 
-} 
+uint64_t* table_pourcentage_huffman(char const* file_name){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
+  FILE* f = fopen(file_name, "r");
+  if (!f) {
+    printf("Ouverture du fichier impossible. Abandon.\n");
+    exit(0);
+  }
+  uint64_t* table = malloc(256 * sizeof(uint64_t));
+  for (int i = 0; i < 256; i++) {
+    table[i] = 0;
+  }
+  uint8_t c;
+  while ((c = fgetc(f)) != (uint8_t)EOF) {
+    table[c]++;
+  }
+  table[255]=1;
+  fclose(f);
+
+  return table;
+}
 
 int conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
   int i = 0;
@@ -79,26 +81,30 @@ int conversion_tableau_liste(uint64_t *occurence, pliste_t liste) {
  * \param    occurence    Tableeau des occurrences des caractère ASCII
  * \return   Noeud racine de l'arbre de huffman
  */
-pnoeud_t creer_arbre_quelconque(uint64_t *occurence) {
-  pliste_t liste = malloc(sizeof(liste_t));
-  conversion_tableau_liste(occurence, liste);
+pnoeud_t creer_arbre_quelconque(pliste_t liste) {
   afficher_liste_noeud(liste);
-
   while (liste->tete != liste->queue) {
     pnoeud_t noeud1 = retirer_noeud(get_noeud_min(liste), liste);
     pnoeud_t noeud2 = retirer_noeud(get_noeud_min(liste), liste);
     if (noeud1 != NULL && noeud2 != NULL) {
       pnoeud_t parent = creer_noeud(noeud1->poids + noeud2->poids);
+      printf("noeud1 --> %d \n",noeud1->c);
+      printf("noeud2 --> %d \n",noeud2->c);
+      printf("parent --> %d \n",parent->c);
       if (estFeuille(noeud1) && estFeuille(noeud2)) {
+        printf("salem\n");
         parent->fgauche = noeud2;
         parent->fdroit = noeud1;
       } else if (estFeuille(noeud1) && !estFeuille(noeud2)) {
+        printf("salem\n");
         parent->fgauche = noeud2;
         parent->fdroit = noeud1;
       } else if (estFeuille(noeud2) && !estFeuille(noeud1)) {
+        printf("salem\n");
         parent->fgauche = noeud1;
         parent->fdroit = noeud2;
       } else {
+        printf("salem\n");
         if (profondeur(noeud1) > profondeur(noeud2)) {
           parent->fgauche = noeud1;
           parent->fdroit = noeud2;
@@ -248,6 +254,7 @@ void tri_tableau(pcodage_t table, int taille) {
  * \return   Table de huffman canonique (caractère, longueur de code)
  */
 void table_quelconque_to_canonique(pcodage_t table, int taille) {
+  tri_tableau(table, taille);
 
   int a = 0, b = 0;
 
