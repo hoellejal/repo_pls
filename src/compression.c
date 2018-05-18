@@ -1,10 +1,23 @@
 #include "compression.h"
 #include "decompression.h"
 
+void compression(char* path){
+  uint64_t *occurence = table_pourcentage_huffman(path);
+  pliste_t liste = malloc(sizeof(liste_t));
+  int nb_char = conversion_tableau_liste(occurence,liste);
+  pnoeud_t racine = creer_arbre_quelconque(liste);
+  afficher_arbre(racine, 0);
+	printf("==============================================================================\n");
+	tri_arbre_largeur(racine);
+  afficher_arbre(racine, 0);
 
+	pcodage_t tableau = arbre_to_table(racine, nb_char);
+  affiche_table_de_codage(tableau,nb_char);
+  ecrire_fichier_compresse(tableau,nb_char,path);
+}
 
 void tri_arbre_largeur(pnoeud_t head){
-	int longueur = 2; 
+	int longueur = 2;
 	pnoeud_t  *tableau = malloc(2*sizeof(pnoeud_t));
 	int indice=0;
   if (head->fgauche != NULL){
@@ -17,18 +30,10 @@ void tri_arbre_largeur(pnoeud_t head){
 	}
 
 	while (longueur > 0){
-			affiche_noueud_tableau(tableau,longueur);
+			//affiche_noueud_tableau(tableau,longueur);
 			for (int i = 0; i < longueur; i++) {
     		for (int j = 1; j < longueur - i; j++) {
 					if ( ( profondeur(tableau[j-1]) < profondeur(tableau[j]) ) || ( estFeuille(tableau[j-1]) && estFeuille(tableau[j]) && ( (uint8_t)(tableau[j-1]->c) < (uint8_t)(tableau[j]->c) ) ) ){
-							printf("========================\n");
-							printf("swap entre :\n");
-							afficher_arbre(tableau[j], 0);
-    					printf("parent:%u->%lu | \n",tableau[j]->parent->c, tableau[j]->parent->poids);
-							printf("et :\n");
-  						afficher_arbre(tableau[j-1], 0);
-    					printf("parent:%u->%lu | \n",tableau[j-1]->parent->c, tableau[j-1]->parent->poids);
-							printf("========================\n");
 
 							pnoeud_t tampon;
 							//INVERSION DES NOEUDS//
@@ -62,7 +67,7 @@ void tri_arbre_largeur(pnoeud_t head){
 								tableau[j]->parent = tampon;
 							}
 
-							
+
 							//INVERSION DANS LE TABLEAU//
 							tampon = tableau[j-1];
 							tableau[j-1] = tableau[j];
@@ -89,151 +94,15 @@ void tri_arbre_largeur(pnoeud_t head){
 			longueur = new_longueur;
 			free(ancien_tableau);
 		}
+    free(tableau);
 }
 
 void affiche_table_de_codage(pcodage_t codage,int taille){
   for (int i = 0; i < taille; i++) {
     printf("char: %d;longueur: %d;code: %lu|%lu|%lu|%lu\n", codage[i].c,codage[i].longueur,codage[i].code[3],codage[i].code[2],codage[i].code[1],codage[i].code[0]);
   }
-
 }
 
-void compression(char* path){
-  uint64_t *occurence = table_pourcentage_huffman(path);
-  pliste_t liste = malloc(sizeof(liste_t));
-  int nb_char = conversion_tableau_liste(occurence,liste);
-  pnoeud_t racine = creer_arbre_quelconque(liste);
-  afficher_arbre(racine, 0);
-	printf("================================================================================\n");
-	tri_arbre_largeur(racine);
-	printf("================================================================================\n");
-	printf("-----------------------------------------------------\n" );
-  afficher_arbre(racine, 0);
-  
-	pcodage_t tableau = arbre_to_table(racine, nb_char);
-  table_quelconque_to_canonique(tableau, nb_char);
-  affiche_table_de_codage(tableau,nb_char);
-  ecrire_fichier_compresse(tableau,nb_char,path);
-printf("-----------------------------------------------------\n" );
-  FILE* compress = fopen("../test/test.txt.ggg", "r");
-  if (!compress) {
-    printf("Ouverture du fichier impossible. Abandon.\n");
-    exit(0);
-  }
-  int nb;
-  pcodage_t nouveau_codage = lire_entete(compress,&nb);
-  set_table_decompression(nouveau_codage,nb);
-  affiche_table_de_codage(nouveau_codage,nb);
-  fclose(compress);*/
-
-}
-
-/*
-void tri_arbre_largeur(pnoeud_t head){
-  pliste_t liste = malloc(sizeof(pliste_t));
-  head->suiv = NULL;
-  ajouter_queue(head,liste);
-  printf("%d\n",liste->tete->poids );
-  while (liste->tete != NULL) {
-    printf("=======================\n");
-    afficher_liste_noeud(liste->tete);
-    printf("=======================\n");
-
-    if(liste->tete != liste->queue){
-      pnoeud_t noeud_courant;
-      pnoeud_t noeud_suivant;
-      pnoeud_t noeud_arriver = liste->queue;
-      while (liste->tete !=NULL && noeud_arriver != liste->tete) {
-        noeud_courant = liste->tete;
-        noeud_suivant = noeud_courant->suiv;
-        while (noeud_suivant != NULL && noeud_suivant != noeud_arriver) {
-          if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
-            // if (noeud_suivant->parent == NULL && noeud_courant->parent == NULL){
-            //   pnoeud_t tampon = noeud_suivant->parent;
-            //   noeud_suivant->parent = noeud_courant->parent;
-            //   noeud_courant->parent = tampon->parent;
-
-              if (noeud_courant->parent == noeud_suivant->parent ){
-                pnoeud_t tampon = noeud_suivant;
-                noeud_suivant->parent->fdroit  = noeud_courant;
-                noeud_courant->parent->fgauche = tampon;
-              }else{
-                  pnoeud_t tampon = noeud_suivant;
-                  noeud_suivant->parent->fgauche  = noeud_courant;
-                  noeud_courant->parent->fdroit = tampon;
-              }
-
-          }
-          noeud_courant = noeud_suivant;
-          noeud_suivant = noeud_suivant->suiv;
-        }
-
-        if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
-          // if (noeud_suivant->parent == NULL && noeud_courant->parent == NULL){
-          //   pnoeud_t tampon = noeud_suivant->parent;
-          //   noeud_suivant->parent = noeud_courant->parent;
-          //   noeud_courant->parent = tampon->parent;
-          // }
-
-          if (noeud_courant->parent->fdroit == noeud_courant){
-            pnoeud_t tampon = noeud_suivant;
-            noeud_suivant->parent->fgauche  = noeud_courant;
-            noeud_courant->parent->fdroit = tampon;
-          }else{
-              pnoeud_t tampon = noeud_suivant;
-              noeud_suivant->parent->fdroit  = noeud_courant;
-              noeud_courant->parent->fgauche = tampon;
-          }
-        }
-
-        noeud_arriver=get_precedent(noeud_arriver,liste);
-      }
-
-    }
-    pnoeud_t ancien_queue = liste->queue;
-
-    // printf("========ANCIEN==========\n" );
-    // afficher_liste_noeud(liste);
-    // printf("%d\n",liste->tete->c );
-    // printf("%d\n",ancien_queue->c );
-    // printf("=========================\n");
-    while (liste->tete != ancien_queue) {
-      if (liste->tete->fgauche != NULL){
-        liste->tete->fgauche->suiv = NULL;
-        ajouter_queue(liste->tete->fgauche,liste);
-      }
-      if (liste->tete->fdroit != NULL){
-        liste->tete->fdroit->suiv = NULL;
-        ajouter_queue(liste->tete->fdroit,liste);
-      }
-      retirer_noeud(liste->tete,liste);
-    }
-      if (ancien_queue->fgauche != NULL){
-        ancien_queue->fgauche->suiv = NULL;
-        ajouter_queue(ancien_queue->fgauche,liste);
-      }
-      if (ancien_queue->fdroit != NULL){
-        ancien_queue->fdroit->suiv = NULL;
-        ajouter_queue(ancien_queue->fdroit,liste);
-      }
-      retirer_noeud(liste->tete,liste);
-    }
-    // printf("========NEW==========\n" );
-    // afficher_liste_noeud(liste);
-    // printf("=========================\n");
-
-}*/
-
-
-////////////////////////////////
-/*      FONCTION CONVERSION   */
-////////////////////////////////
-/**
- * \brief    Initialise une liste chainée des noeuds correspondant aux
- * caractères présents dans le fichier à compresser
- * \param    occurence    Tableau des occurrences des caractère ASCII
- * \param    liste        Structure représentatn la liste (tête et queue)
- */
 
 uint64_t* table_pourcentage_huffman(char * path){ //Recoit le nom du fichier a compresser (argv[1]) et renvoie un tableau a 256 cases des occurences des caractères
 
@@ -251,7 +120,6 @@ uint64_t* table_pourcentage_huffman(char * path){ //Recoit le nom du fichier a c
   while ((c = fgetc(f)) != (uint8_t)EOF) {
     table[c]++;
   }
-  table[255]=1;
   fclose(f);
   return table;
 }
@@ -435,73 +303,24 @@ void arbre_to_table_Worker(pnoeud_t racine, int *indice, uint64_t valeur0,
   }
 }
 
-/**
- * \brief    Tri le tableau table selon la longueur des codages
- * \param    table  Tableau à trier
- * \param    taille Taille du tableau
- */
-void tri_tableau(pcodage_t table, int taille) {
-
-  for (int i = 0; i < taille; i++) {
-    for (int j = 1; j < taille - i; j++) {
-      if (table[j - 1].longueur > table[j].longueur) {
-        codage_t tampon = table[j - 1];
-        table[j - 1] = table[j];
-        table[j] = tampon;
-      }
-    }
-  }
-}
-
-/**
- * \brief    Tri le tableau table selon les caractères
- * \details  Table doit avoir des éléments contigus selon la longueur des codage
- * \param    table_quelconque    Tableau de codage des caractères, les éléments
- * de même longueur de code sont contigus.
- * \param    longueur_table      Taille du tableau table_quelconque
- * \return   Table de huffman canonique (caractère, longueur de code)
- */
-void table_quelconque_to_canonique(pcodage_t table, int taille) {
-  tri_tableau(table, taille);
-
-  int a = 0, b = 0;
-
-  while (b < taille) {
-    while (b < taille &&
-           table[b].longueur ==
-               table[b + 1].longueur) // borne sup du sous tableau
-      b++;
-
-    for (int i = a; i <= b; i++) {
-      for (int j = a + 1; j <= b - i + a; j++) {
-        if (table[j - 1].c > table[j].c) {
-          char tampon = table[j - 1].c;
-          table[j - 1].c = table[j].c;
-          table[j].c = tampon;
-        }
-      }
-    }
-    a = b + 1;
-    b = b + 1;
-  }
-}
-
 
 void ecrire_buffer(FILE* f, uint64_t* buffer){
-  char* tmp = (char*)buffer;
-  for (int i = 7; i >= 0; i--) {
-    fprintf(f, "%c", tmp[i]);
+  if (buffer[0] != 0 && buffer[1] != 0 && buffer[2] != 0 && buffer[3] != 0){
+    char* tmp = (char*)buffer;
+    for (int i = 7; i >= 0; i--) {
+      fprintf(f, "%c", tmp[i]);
+    }
   }
   *buffer = 0;
 }
 
 int ecrire_fichier_compresse(pcodage_t codage, int nb_codage,char* file_name){
 
-    FILE* fr = fopen(file_name, "r");
-    if (!fr) {
-      printf("Ouverture du fichier impossible. Abandon.\n");
-      exit(0);
-    }
+  FILE* fr = fopen(file_name, "r");
+  if (!fr) {
+    printf("Ouverture du fichier impossible. Abandon.\n");
+    exit(0);
+  }
 
   char* comp_name = malloc(strlen(file_name) + 4);
   strcpy(comp_name,file_name);
@@ -518,7 +337,7 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage,char* file_name){
   int i;
   uint64_t buffer = 0;
   uint64_t save,mask;
-  while ((c = fgetc(fr)) != (uint8_t)EOF) {
+  while ((c = fgetc(fr)) != ((uint8_t)EOF) ) {
     i=0;
     while(codage[i].c != c){
       i++;

@@ -1,6 +1,5 @@
 CC = gcc
-OBJS = compression.o noeud.o decompression.o
-TEST = ../test/test_compression.o
+OBJS = compression.o noeud.o decompression.o rle.o mtf.o compresseur.o
 CFLAGS = -Wall
 CPPFLAGS = -I$(HEADER)
 EXEC = ../bin/compression
@@ -8,8 +7,8 @@ HEADER = ../header
 
 all:	$(EXEC)
 
-$(EXEC):	$(OBJS) $(TEST)
-	$(CC) $(OBJS) $(TEST) -o $(EXEC)
+$(EXEC):	$(OBJS)
+	$(CC) $(OBJS)  -o $(EXEC) -g
 
 
 clean:

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-void compression(char const* file_name) {
+void compression_rle(char const* file_name) {
   FILE* f = fopen(file_name, "r");
   if (!f) {
     printf("Ouverture du fichier impossible. Abandon.\n");
@@ -34,7 +34,7 @@ void compression(char const* file_name) {
   fclose(new_f);
 }
 
-void decompression(char const* file_name) {
+void decompression_rle(char const* file_name) {
   FILE* f = fopen(file_name, "r");
   if (!f) {
     printf("Ouverture du fichier impossible. Abandon.\n");
@@ -61,9 +61,9 @@ void decompression(char const* file_name) {
   fclose(new_f);
 }
 
-int main(int argc, char const *argv[]) {
-  compression(argv[1]);
-  decompression("../test/codage_rle");
+int rle(char* path) {
+  compression_rle(path);
+  decompression_rle("../test/codage_rle");
 
   return 0;
 }

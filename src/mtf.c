@@ -63,8 +63,8 @@ void decodage(char const* coded_file_name) {
   fclose(new_f);
 }
 
-int main(int argc, char const *argv[]) {
-  codage(argv[1]);
+int mtf(char* path) {
+  codage(path);
   decodage("../test/codage_mtf");
 
   return 0;

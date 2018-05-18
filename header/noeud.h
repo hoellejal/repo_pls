@@ -20,9 +20,7 @@ typedef struct {
     pnoeud_t queue;
 } liste_t, *pliste_t;
 
-////////////////////////////////
-/* FONCTION ELEMENTAIRE NOEUD */
-////////////////////////////////
+
 void affiche_noueud_tableau(pnoeud_t *tableau,int longueur);
 void afficher_arbre(pnoeud_t a, int niveau);
 void afficher_liste_noeud(pliste_t liste);

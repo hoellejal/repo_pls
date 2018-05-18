@@ -15,10 +15,6 @@ typedef struct {
 } codage_t , *pcodage_t;
 
 
-
-////////////////////////////////
-/*      FONCTION CONVERSION   */
-////////////////////////////////
 void affiche_table_de_codage(pcodage_t codage,int taille);
 
 void ecrire_buffer(FILE* f, uint64_t* buffer);
@@ -31,8 +27,6 @@ void compression(char* path);
 
 void tri_arbre_largeur(pnoeud_t head);
 
-void tri_tableau(pcodage_t table,int taille);
-
 int conversion_tableau_liste(uint64_t *occurence, pliste_t liste);
 
 pcodage_t arbre_to_table(pnoeud_t racine, int nombre_carractere);
@@ -44,15 +38,6 @@ void decalage_256(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint6
 void decalage_256_multiple(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3,uint64_t decalage);
 
 void incremente(uint64_t *valeur0, uint64_t *valeur1, uint64_t *valeur2, uint64_t *valeur3);
-
-void table_quelconque_to_canonique(pcodage_t table_quelconque, int longueur_table);
-
-
-
-
-////////////////////////////////
-/*   FONCTION CREATION ARBRE  */
-////////////////////////////////
 
 pnoeud_t creer_arbre_quelconque(pliste_t liste);
 
