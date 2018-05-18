@@ -33,5 +33,6 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste);
 pnoeud_t get_noeud_min(pliste_t liste);
 int estFeuille(pnoeud_t noeud);
 int profondeur(pnoeud_t noeud);
+pnoeud_t get_precedent(pnoeud_t noeud_arriver,pliste_t liste);
 
 #endif

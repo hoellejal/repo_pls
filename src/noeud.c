@@ -1,7 +1,6 @@
 #include "noeud.h"
-#include <stdlib.h>
 #include <stdint.h>
-
+#include <stdlib.h>
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -27,6 +26,31 @@ pnoeud_t get_precedent(pnoeud_t noeud_arriver,pliste_t liste){
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
+
+void inverser_noeuds(pnoeud_t n1, pnoeud_t n2) {
+  if(n1 != NULL && n2 != NULL) {
+    if(n1->parent == n2->parent) {
+      pnoeud_t tmp = n1->parent->fgauche;
+      n1->parent->fgauche = n1->parent->fdroit;
+      n1->parent->fdroit = tmp;
+    }else {// inverser noeud + changer parent des noeuds
+      pnoeud_t tmp_parent1 = n1->parent;
+      pnoeud_t tmp_parent2 = n2->parent;
+
+      if(n1->parent->fdroit == n1) {
+        n1->parent->fdroit = n2;
+        n2->parent->fgauche = n1;
+      }else {
+        n1->parent->fgauche = n2;
+        n2->parent->fdroit = n1;
+      }
+      n1->parent = tmp_parent2;
+      n2->parent = tmp_parent1;
+
+    }
+  }
+}
+
 void afficher_arbre(pnoeud_t a, int niveau) {
   int i;
   if (a != NULL) {
@@ -45,12 +69,11 @@ void afficher_liste_noeud(pliste_t liste) {
     return;
   pnoeud_t n = liste->tete;
   while (n != NULL) {
-    printf("%u->%lu | ",n->c, n->poids);
+    printf("%u->%lu | ", n->c, n->poids);
     n = n->suiv;
   }
   printf("\n");
 }
-
 
 pnoeud_t creer_noeud(uint64_t poids) {
   pnoeud_t noeud = malloc(sizeof(noeud_t));
@@ -107,7 +130,9 @@ pnoeud_t get_noeud_min(pliste_t liste) {
     pnoeud_t noeud_min = noeud_courant;
     noeud_courant = noeud_courant->suiv;
     while (noeud_courant != NULL) {
-      if (noeud_min->poids > noeud_courant->poids || ( noeud_min->poids == noeud_courant->poids  &&  profondeur(noeud_min) < profondeur(noeud_courant) ) ) {
+      if (noeud_min->poids > noeud_courant->poids ||
+          (noeud_min->poids == noeud_courant->poids &&
+           profondeur(noeud_min) < profondeur(noeud_courant))) {
         noeud_min = noeud_courant;
       }
       noeud_courant = noeud_courant->suiv;
@@ -119,9 +144,9 @@ pnoeud_t get_noeud_min(pliste_t liste) {
 }
 
 int estFeuille(pnoeud_t noeud) {
-  if (noeud != NULL){
+  if (noeud != NULL) {
     return (noeud->fgauche == NULL && noeud->fdroit == NULL);
-  }else{
+  } else {
     return 0;
   }
 }

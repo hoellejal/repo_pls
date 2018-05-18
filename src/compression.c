@@ -124,9 +124,106 @@ printf("-----------------------------------------------------\n" );
   pcodage_t nouveau_codage = lire_entete(compress,&nb);
   set_table_decompression(nouveau_codage,nb);
   affiche_table_de_codage(nouveau_codage,nb);
-  fclose(compress);
+  fclose(compress);*/
 
 }
+
+/*
+void tri_arbre_largeur(pnoeud_t head){
+  pliste_t liste = malloc(sizeof(pliste_t));
+  head->suiv = NULL;
+  ajouter_queue(head,liste);
+  printf("%d\n",liste->tete->poids );
+  while (liste->tete != NULL) {
+    printf("=======================\n");
+    afficher_liste_noeud(liste->tete);
+    printf("=======================\n");
+
+    if(liste->tete != liste->queue){
+      pnoeud_t noeud_courant;
+      pnoeud_t noeud_suivant;
+      pnoeud_t noeud_arriver = liste->queue;
+      while (liste->tete !=NULL && noeud_arriver != liste->tete) {
+        noeud_courant = liste->tete;
+        noeud_suivant = noeud_courant->suiv;
+        while (noeud_suivant != NULL && noeud_suivant != noeud_arriver) {
+          if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
+            // if (noeud_suivant->parent == NULL && noeud_courant->parent == NULL){
+            //   pnoeud_t tampon = noeud_suivant->parent;
+            //   noeud_suivant->parent = noeud_courant->parent;
+            //   noeud_courant->parent = tampon->parent;
+
+              if (noeud_courant->parent == noeud_suivant->parent ){
+                pnoeud_t tampon = noeud_suivant;
+                noeud_suivant->parent->fdroit  = noeud_courant;
+                noeud_courant->parent->fgauche = tampon;
+              }else{
+                  pnoeud_t tampon = noeud_suivant;
+                  noeud_suivant->parent->fgauche  = noeud_courant;
+                  noeud_courant->parent->fdroit = tampon;
+              }
+
+          }
+          noeud_courant = noeud_suivant;
+          noeud_suivant = noeud_suivant->suiv;
+        }
+
+        if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
+          // if (noeud_suivant->parent == NULL && noeud_courant->parent == NULL){
+          //   pnoeud_t tampon = noeud_suivant->parent;
+          //   noeud_suivant->parent = noeud_courant->parent;
+          //   noeud_courant->parent = tampon->parent;
+          // }
+
+          if (noeud_courant->parent->fdroit == noeud_courant){
+            pnoeud_t tampon = noeud_suivant;
+            noeud_suivant->parent->fgauche  = noeud_courant;
+            noeud_courant->parent->fdroit = tampon;
+          }else{
+              pnoeud_t tampon = noeud_suivant;
+              noeud_suivant->parent->fdroit  = noeud_courant;
+              noeud_courant->parent->fgauche = tampon;
+          }
+        }
+
+        noeud_arriver=get_precedent(noeud_arriver,liste);
+      }
+
+    }
+    pnoeud_t ancien_queue = liste->queue;
+
+    // printf("========ANCIEN==========\n" );
+    // afficher_liste_noeud(liste);
+    // printf("%d\n",liste->tete->c );
+    // printf("%d\n",ancien_queue->c );
+    // printf("=========================\n");
+    while (liste->tete != ancien_queue) {
+      if (liste->tete->fgauche != NULL){
+        liste->tete->fgauche->suiv = NULL;
+        ajouter_queue(liste->tete->fgauche,liste);
+      }
+      if (liste->tete->fdroit != NULL){
+        liste->tete->fdroit->suiv = NULL;
+        ajouter_queue(liste->tete->fdroit,liste);
+      }
+      retirer_noeud(liste->tete,liste);
+    }
+      if (ancien_queue->fgauche != NULL){
+        ancien_queue->fgauche->suiv = NULL;
+        ajouter_queue(ancien_queue->fgauche,liste);
+      }
+      if (ancien_queue->fdroit != NULL){
+        ancien_queue->fdroit->suiv = NULL;
+        ajouter_queue(ancien_queue->fdroit,liste);
+      }
+      retirer_noeud(liste->tete,liste);
+    }
+    // printf("========NEW==========\n" );
+    // afficher_liste_noeud(liste);
+    // printf("=========================\n");
+
+}*/
+
 
 ////////////////////////////////
 /*      FONCTION CONVERSION   */
