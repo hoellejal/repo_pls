@@ -23,9 +23,11 @@ typedef struct {
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
+void affiche_noueud_tableau(pnoeud_t *tableau,int longueur);
 void afficher_arbre(pnoeud_t a, int niveau);
 void afficher_liste_noeud(pliste_t liste);
 pnoeud_t creer_noeud(uint64_t poids);
+pnoeud_t get_precedent(pnoeud_t noeud_arriver,pliste_t liste);
 void ajouter_queue(pnoeud_t noeud, pliste_t liste);
 pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste);
 pnoeud_t get_noeud_min(pliste_t liste);

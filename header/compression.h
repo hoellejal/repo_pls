@@ -28,7 +28,7 @@ int ecrire_fichier_compresse(pcodage_t codage, int nb_codage,char* file_name);
 uint64_t* table_pourcentage_huffman(char *file_name);
 
 void compression(char* path);
-void get_precedent(pnoeud_t noeud_arriver,pliste_t liste);
+
 void tri_arbre_largeur(pnoeud_t head);
 
 void tri_tableau(pcodage_t table,int taille);

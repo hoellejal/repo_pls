@@ -6,6 +6,24 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 
+
+void affiche_noueud_tableau(pnoeud_t *tableau,int longueur){
+	for(int i=0;i<longueur;i++){
+		printf("%u->%lu | ",tableau[i]->c, tableau[i]->poids);
+	}
+  printf("\n");
+}
+
+
+pnoeud_t get_precedent(pnoeud_t noeud_arriver,pliste_t liste){
+  pnoeud_t head = liste->tete;
+  while (head->suiv != noeud_arriver){
+    head = head->suiv;
+  }
+  return head;
+}
+
+
 ////////////////////////////////
 /* FONCTION ELEMENTAIRE NOEUD */
 ////////////////////////////////
@@ -17,7 +35,7 @@ void afficher_arbre(pnoeud_t a, int niveau) {
     for (i = 0; i < niveau; i++)
       printf("\t");
 
-    printf(" %lu %c (%d)\n\n", a->poids, a->c, niveau);
+    printf(" %lu %u (%d)\n\n", a->poids, a->c, niveau);
     afficher_arbre(a->fgauche, niveau + 1);
   }
 }
@@ -40,10 +58,12 @@ pnoeud_t creer_noeud(uint64_t poids) {
   noeud->fgauche = NULL;
   noeud->fdroit = NULL;
   noeud->parent = NULL;
+  noeud->suiv = NULL;
   return noeud;
 }
 
 void ajouter_queue(pnoeud_t noeud, pliste_t liste) {
+	noeud->suiv = NULL;
   if (liste->tete == NULL) {
     liste->tete = liste->queue = noeud;
   } else {
@@ -54,10 +74,16 @@ void ajouter_queue(pnoeud_t noeud, pliste_t liste) {
 
 pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
   if (liste->tete != NULL) {
-    if (noeud == liste->tete) {
-      liste->tete = liste->tete->suiv;
+    if (noeud == liste->tete && liste->tete == liste->queue) {
+      liste->tete = NULL;
+      liste->queue = NULL;
+			noeud->suiv = NULL;
       return noeud;
-    } else {
+    } else if(noeud == liste->tete && liste->tete != liste->queue){
+			liste->tete = liste->tete->suiv;
+			noeud->suiv = NULL;
+      return noeud;
+		}else {
       pnoeud_t noeud_courant = liste->tete;
       while (noeud_courant->suiv != liste->queue &&
              noeud_courant->suiv != noeud) {
@@ -67,6 +93,7 @@ pnoeud_t retirer_noeud(pnoeud_t noeud, pliste_t liste) {
         liste->queue = noeud_courant;
       }
       noeud_courant->suiv = noeud_courant->suiv->suiv;
+			noeud->suiv = NULL;
       return noeud;
     }
   } else {

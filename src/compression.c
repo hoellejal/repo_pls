@@ -4,51 +4,91 @@
 
 
 void tri_arbre_largeur(pnoeud_t head){
-  pliste_t liste = malloc(sizeof(pliste_t));
+	int longueur = 2; 
+	pnoeud_t  *tableau = malloc(2*sizeof(pnoeud_t));
+	int indice=0;
+  if (head->fgauche != NULL){
+		tableau[indice] = head->fgauche;
+		indice++;
+	}
+	if (head->fdroit != NULL){
+		tableau[indice] = head->fdroit;
+		indice++;
+	}
 
-  ajouter_queue(head,liste);
+	while (longueur > 0){
+			affiche_noueud_tableau(tableau,longueur);
+			for (int i = 0; i < longueur; i++) {
+    		for (int j = 1; j < longueur - i; j++) {
+					if ( ( profondeur(tableau[j-1]) < profondeur(tableau[j]) ) || ( estFeuille(tableau[j-1]) && estFeuille(tableau[j]) && ( (uint8_t)(tableau[j-1]->c) < (uint8_t)(tableau[j]->c) ) ) ){
+							printf("========================\n");
+							printf("swap entre :\n");
+							afficher_arbre(tableau[j], 0);
+    					printf("parent:%u->%lu | \n",tableau[j]->parent->c, tableau[j]->parent->poids);
+							printf("et :\n");
+  						afficher_arbre(tableau[j-1], 0);
+    					printf("parent:%u->%lu | \n",tableau[j-1]->parent->c, tableau[j-1]->parent->poids);
+							printf("========================\n");
 
-  while (liste->queue != NULL) {
-    if(liste->tete != liste->queue){
-      pnoeud_t noeud_courant;
-      pnoeud_t noeud_suivant;
-      pnoeud_t noeud_arriver = liste->queue;
-      while (noeud_arriver != liste->tete) {
-        noeud_courant = liste->tete;
-        noeud_suivant = noeud_courant->suiv;
-        while (noeud_suivant <= noeud_arriver) {
-          if(profondeur(noeud_suivant) > profondeur(noeud_courant) || ( (estFeuille(noeud_suivant) && estFeuille(noeud_courant)) &&  (noeud_suivant->c > noeud_courant->c) ) ){
-            pnoeud_t tampon = noeud_suivant->parent;
-            noeud_suivant->parent = noeud_courant;
-            noeud_courant->parent = tampon;
-          }
-          noeud_courant = noeud_suivant;
-          noeud_suivant = noeud_suivant->suiv;
-        }
-        noeud_arriver=get_precedent(noeud_arriver,liste);
-      }
+							pnoeud_t tampon;
+							//INVERSION DES NOEUDS//
+							if (tableau[j-1]->parent != tableau[j]->parent){
+								if (tableau[j-1]->parent->fgauche == tableau[j-1]){
+									tableau[j-1]->parent->fgauche = tableau[j];
+								}else{
+									tableau[j-1]->parent->fdroit = tableau[j];
+								}
 
-      pnoeud_t ancien_queue = liste->queue;
+								if (tableau[j]->parent->fgauche == tableau[j]){
+									tableau[j]->parent->fgauche = tableau[j-1];
+								}else{
+									tableau[j]->parent->fdroit = tableau[j-1];
+								}
 
-      while (liste->tete<=ancien_queue) {
-        if (liste->tete->fgauche != NULL){
-          ajouter_queue(liste->tete->fgauche,liste);
-        }
-        if (liste->tete->fdroit != NULL){
-          ajouter_queue(liste->tete->fdroit,liste);
-        }
-        retirer_noeud(liste->tete,liste);
-      }
-    }
-  }
-}
+							}else{
+								if(tableau[j-1]->parent->fgauche == tableau[j-1]){
+									tableau[j-1]->parent->fgauche = tableau[j];
+									tableau[j-1]->parent->fdroit = tableau[j-1];
+								}else{
+									tableau[j-1]->parent->fgauche = tableau[j-1];
+									tableau[j-1]->parent->fdroit = tableau[j];
+								}
 
-void get_precedent(noeud_arriver,liste){
-  pnoeud_t head = liste->tete;
-  while (head->suiv != noeud_arriver){
-    head = head->suiv;
-  }
-  return head;
+							}
+							//INVERSION DES PARENT DES NOEUDS//
+							if (tableau[j-1]->parent != tableau[j]->parent){
+								tampon = tableau[j-1]->parent;
+								tableau[j-1]->parent = tableau[j]->parent;
+								tableau[j]->parent = tampon;
+							}
+
+							
+							//INVERSION DANS LE TABLEAU//
+							tampon = tableau[j-1];
+							tableau[j-1] = tableau[j];
+							tableau[j] = tampon;
+					}
+				}
+			}
+			//CREATION ET REMPLISSAGE D'UN NOUVEAUX TABLEAU//
+			int new_longueur=0;
+			pnoeud_t *nouveaux_tableau = malloc(2*longueur*sizeof(pnoeud_t));;
+			for(int i=0;i<longueur;i++){
+				if (tableau[i]->fgauche != NULL){
+					nouveaux_tableau[new_longueur]=tableau[i]->fgauche;
+					new_longueur++;
+				}
+				if (tableau[i]->fdroit != NULL){
+					nouveaux_tableau[new_longueur]=tableau[i]->fdroit;
+					new_longueur++;
+				}
+			}
+			//ON L'IBERE L'ANCIEN TABLEAU//
+			pnoeud_t *ancien_tableau = tableau;
+			tableau = nouveaux_tableau;
+			longueur = new_longueur;
+			free(ancien_tableau);
+		}
 }
 
 void affiche_table_de_codage(pcodage_t codage,int taille){
@@ -64,7 +104,13 @@ void compression(char* path){
   int nb_char = conversion_tableau_liste(occurence,liste);
   pnoeud_t racine = creer_arbre_quelconque(liste);
   afficher_arbre(racine, 0);
-  pcodage_t tableau = arbre_to_table(racine, nb_char);
+	printf("================================================================================\n");
+	tri_arbre_largeur(racine);
+	printf("================================================================================\n");
+	printf("-----------------------------------------------------\n" );
+  afficher_arbre(racine, 0);
+  
+	pcodage_t tableau = arbre_to_table(racine, nb_char);
   table_quelconque_to_canonique(tableau, nb_char);
   affiche_table_de_codage(tableau,nb_char);
   ecrire_fichier_compresse(tableau,nb_char,path);
@@ -176,6 +222,8 @@ pnoeud_t creer_arbre_quelconque(pliste_t liste) {
           parent->fdroit = noeud1;
         }
       }
+			noeud1->suiv=NULL;
+      noeud2->suiv=NULL;
       noeud1->parent = parent;
       noeud2->parent = parent;
       ajouter_queue(parent, liste);
